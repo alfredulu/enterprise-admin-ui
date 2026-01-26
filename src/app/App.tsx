@@ -6,19 +6,26 @@ import UsersPage from "@/pages/UsersPage";
 import TicketsPage from "@/pages/TicketsPage";
 import TicketDetailsPage from "@/pages/TicketDetailsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import ProtectedRoute from "@/app/ProtectedRoute";
 
 export default function App() {
+  // TEMP: will replace with Supabase session
+
+  const isAuthed = false;
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/users" element={<UsersPage />} />
-        <Route path="/tickets" element={<TicketsPage />} />
-        <Route path="/tickets/:id" element={<TicketDetailsPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+      <Route element={<ProtectedRoute isAuthed={isAuthed} />}>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/tickets" element={<TicketsPage />} />
+          <Route path="/tickets/:id" element={<TicketDetailsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
