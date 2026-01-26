@@ -13,9 +13,10 @@ export default function AppLayout() {
       <div className="mx-auto w-full max-w-7xl rounded-2xl border border-border bg-background shadow-lg">
         <div className="grid min-h-[calc(100vh-3rem)] grid-cols-1 md:grid-cols-[260px_1fr]">
           {/* Sidebar */}
-          <aside className="border-b border-border bg-muted/40 md:border-b-0 md:border-r">
+          <aside className="border-b border-border bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] md:border-b-0 md:border-r">
             <div className="p-4">
               <div className="text-lg font-semibold">SaaS Admin</div>
+
               <nav className="mt-6 space-y-1">
                 {navItems.map((item) => (
                   <NavLink
@@ -25,8 +26,8 @@ export default function AppLayout() {
                       [
                         "block rounded-md px-3 py-2 text-sm transition",
                         isActive
-                          ? "bg-muted font-medium text-foreground"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                          ? "bg-[hsl(var(--sidebar-hover))] font-medium"
+                          : "text-[hsl(var(--sidebar-muted))] hover:bg-[hsl(var(--sidebar-hover))] hover:text-[hsl(var(--sidebar-foreground))]",
                       ].join(" ")
                     }
                   >
