@@ -1,4 +1,7 @@
 import { Outlet, NavLink } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import { useSession } from "@/features/auth/useSession";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard" },
@@ -8,6 +11,13 @@ const navItems = [
 ];
 
 export default function AppLayout() {
+  const { session } = useSession();
+  const email = session?.user.email ?? "—";
+
+  async function onLogout() {
+    await supabase.auth.signOut();
+  }
+
   return (
     <div className="min-h-screen bg-muted text-foreground p-6 md:p-8">
       <div className="mx-auto w-full max-w-7xl rounded-2xl border border-border bg-background shadow-lg">
@@ -45,7 +55,12 @@ export default function AppLayout() {
                 <div className="text-sm text-muted-foreground">
                   Admin Dashboard
                 </div>
-                <div className="text-sm text-muted-foreground">User menu</div>
+                <div className="flex items-center gap-3">
+                  <div className="text-sm text-muted-foreground">{email}</div>
+                  <Button variant="secondary" size="sm" onClick={onLogout}>
+                    Logout
+                  </Button>
+                </div>
               </div>
             </header>
 
