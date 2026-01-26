@@ -7,17 +7,16 @@ import TicketsPage from "@/pages/TicketsPage";
 import TicketDetailsPage from "@/pages/TicketDetailsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import ProtectedRoute from "@/app/ProtectedRoute";
+import { useSession } from "@/features/auth/useSession";
 
 export default function App() {
-  // TEMP: will replace with Supabase session
-
-  const isAuthed = false;
+  const { isAuthed, loading } = useSession();
 
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
-      <Route element={<ProtectedRoute isAuthed={isAuthed} />}>
+      <Route element={<ProtectedRoute isAuthed={isAuthed} loading={loading} />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
