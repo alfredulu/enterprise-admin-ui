@@ -1,11 +1,18 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTickets } from "@/services/tickets";
+import { useCreateTicket } from "@/hooks/useCreateTicket";
 
 export default function TicketsPage() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["tickets"],
     queryFn: getTickets,
   });
+  const { mutate, isPending } = useCreateTicket();
+
+  const [title, setTitle] = useState("");
+  const [status, setStatus] = useState("open");
+  const [priority, setPriority] = useState("medium");
 
   if (isLoading) {
     return (
@@ -29,6 +36,55 @@ export default function TicketsPage() {
           Tickets loaded from Supabase.
         </p>
       </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutate({ title, status, priority });
+          setTitle("");
+          setStatus("open");
+          setPriority("medium");
+        }}
+        className="space-y-2 rounded-xl border border-border p-4"
+      >
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Ticket title"
+          required
+          className="w-full rounded-md border border-border px-3 py-2 text-sm"
+        />
+
+        <div className="flex gap-2">
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="flex-1 rounded-md border border-border px-3 py-2 text-sm"
+          >
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="closed">Closed</option>
+          </select>
+
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            className="flex-1 rounded-md border border-border px-3 py-2 text-sm"
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+        >
+          {isPending ? "Creating…" : "Create Ticket"}
+        </button>
+      </form>
 
       <div className="overflow-hidden rounded-xl border border-border">
         <table className="w-full text-sm">

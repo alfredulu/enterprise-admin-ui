@@ -10,3 +10,22 @@ export async function getTickets(): Promise<Ticket[]> {
   if (error) throw new Error(error.message);
   return data ?? [];
 }
+export type CreateTicketInput = {
+  title: string;
+  status: string;
+  priority: string;
+};
+
+export async function createTicket(input: CreateTicketInput): Promise<Ticket> {
+  const { data, error } = await supabase
+    .from("tickets")
+    .insert(input)
+    .select("id,title,status,priority,created_at")
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
