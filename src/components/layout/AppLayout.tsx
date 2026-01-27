@@ -15,7 +15,10 @@ export default function AppLayout() {
   const email = session?.user.email ?? "—";
 
   async function onLogout() {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Logout failed:", error);
+    }
   }
 
   return (
@@ -57,7 +60,12 @@ export default function AppLayout() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-sm text-muted-foreground">{email}</div>
-                  <Button variant="secondary" size="sm" onClick={onLogout}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={onLogout}
+                  >
                     Logout
                   </Button>
                 </div>
