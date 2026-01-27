@@ -98,6 +98,7 @@ export default function TicketsPage() {
               <th>Status</th>
               <th>Priority</th>
               <th>Created</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -123,7 +124,6 @@ export default function TicketsPage() {
                     <option value="closed">Closed</option>
                   </select>
                 </td>
-
                 <td>
                   <select
                     value={t.priority}
@@ -140,9 +140,20 @@ export default function TicketsPage() {
                     <option value="high">High</option>
                   </select>
                 </td>
-
                 <td className="text-muted-foreground">
                   {new Date(t.created_at).toLocaleString()}
+                </td>
+                <td>
+                  <button
+                    onClick={() => {
+                      if (confirm("Delete this ticket?")) {
+                        deleteTicket(t.id);
+                      }
+                    }}
+                    className="text-sm text-destructive hover:underline"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
