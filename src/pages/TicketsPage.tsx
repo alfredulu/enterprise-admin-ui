@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTickets } from "@/services/tickets";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
+import { useUpdateTicket } from "@/hooks/useUpdateTicket";
+import { useDeleteTicket } from "@/hooks/useDeleteTicket";
 
 export default function TicketsPage() {
   const { data, isLoading, isError, error } = useQuery({
@@ -9,6 +11,8 @@ export default function TicketsPage() {
     queryFn: getTickets,
   });
   const { mutate, isPending } = useCreateTicket();
+  const { mutate: updateTicket } = useUpdateTicket();
+  const { mutate: deleteTicket } = useDeleteTicket();
 
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState("open");
@@ -103,8 +107,40 @@ export default function TicketsPage() {
                 className="border-t border-border [&>td]:px-4 [&>td]:py-3"
               >
                 <td className="font-medium">{t.title}</td>
-                <td className="text-muted-foreground">{t.status}</td>
-                <td className="text-muted-foreground">{t.priority}</td>
+                <td>
+                  <select
+                    value={t.status}
+                    onChange={(e) =>
+                      updateTicket({
+                        id: t.id,
+                        updates: { status: e.target.value },
+                      })
+                    }
+                    className="rounded-md border border-border px-2 py-1 text-sm"
+                  >
+                    <option value="open">Open</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </td>
+
+                <td>
+                  <select
+                    value={t.priority}
+                    onChange={(e) =>
+                      updateTicket({
+                        id: t.id,
+                        updates: { priority: e.target.value },
+                      })
+                    }
+                    className="rounded-md border border-border px-2 py-1 text-sm"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </td>
+
                 <td className="text-muted-foreground">
                   {new Date(t.created_at).toLocaleString()}
                 </td>
