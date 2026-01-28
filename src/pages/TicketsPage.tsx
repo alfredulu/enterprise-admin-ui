@@ -147,12 +147,13 @@ export default function TicketsPage() {
                 </td>
                 <td>
                   <button
+                    disabled={isUpdating}
                     onClick={() => {
                       if (confirm("Delete this ticket?")) {
                         deleteTicket(t.id);
                       }
                     }}
-                    className="text-sm text-destructive hover:underline"
+                    className="text-sm text-destructive hover:underline disabled:opacity-60"
                   >
                     Delete
                   </button>
