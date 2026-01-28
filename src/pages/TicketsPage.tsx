@@ -10,8 +10,16 @@ export default function TicketsPage() {
     queryKey: ["tickets"],
     queryFn: getTickets,
   });
-  const { mutate, isPending } = useCreateTicket();
-  const { mutate: updateTicket, isPending: isUpdating } = useUpdateTicket();
+  const { mutate: createTicket, isPending: isCreating } = useCreateTicket();
+
+  const {
+    mutate: updateTicket,
+    isPending: isUpdating,
+    variables,
+  } = useUpdateTicket();
+
+  const updatingId = isUpdating ? variables?.id : null;
+
   const { mutate: deleteTicket } = useDeleteTicket();
 
   const [title, setTitle] = useState("");
@@ -44,8 +52,7 @@ export default function TicketsPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          mutate({ title, status, priority });
-          setTitle("");
+          createTicket({ title, status, priority });
           setStatus("open");
           setPriority("medium");
         }}
@@ -83,10 +90,10 @@ export default function TicketsPage() {
 
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isCreating}
           className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
         >
-          {isPending ? "Creating…" : "Create Ticket"}
+          {isCreating ? "Creating…" : "Create Ticket"}
         </button>
       </form>
 
@@ -111,7 +118,7 @@ export default function TicketsPage() {
                 <td>
                   <select
                     value={t.status}
-                    disabled={isUpdating}
+                    disabled={updatingId === t.id}
                     onChange={(e) =>
                       updateTicket({
                         id: t.id,
@@ -128,7 +135,7 @@ export default function TicketsPage() {
                 <td>
                   <select
                     value={t.priority}
-                    disabled={isUpdating}
+                    disabled={updatingId === t.id}
                     onChange={(e) =>
                       updateTicket({
                         id: t.id,
@@ -147,7 +154,7 @@ export default function TicketsPage() {
                 </td>
                 <td>
                   <button
-                    disabled={isUpdating}
+                    disabled={updatingId === t.id}
                     onClick={() => {
                       if (confirm("Delete this ticket?")) {
                         deleteTicket(t.id);
