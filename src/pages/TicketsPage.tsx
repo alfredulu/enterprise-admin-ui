@@ -11,7 +11,7 @@ export default function TicketsPage() {
     queryFn: getTickets,
   });
   const { mutate, isPending } = useCreateTicket();
-  const { mutate: updateTicket } = useUpdateTicket();
+  const { mutate: updateTicket, isPending: isUpdating } = useUpdateTicket();
   const { mutate: deleteTicket } = useDeleteTicket();
 
   const [title, setTitle] = useState("");
@@ -111,13 +111,14 @@ export default function TicketsPage() {
                 <td>
                   <select
                     value={t.status}
+                    disabled={isUpdating}
                     onChange={(e) =>
                       updateTicket({
                         id: t.id,
                         updates: { status: e.target.value },
                       })
                     }
-                    className="rounded-md border border-border px-2 py-1 text-sm"
+                    className="rounded-md border border-border px-2 py-1 text-sm disabled:opacity-60"
                   >
                     <option value="open">Open</option>
                     <option value="in_progress">In Progress</option>
@@ -127,13 +128,14 @@ export default function TicketsPage() {
                 <td>
                   <select
                     value={t.priority}
+                    disabled={isUpdating}
                     onChange={(e) =>
                       updateTicket({
                         id: t.id,
                         updates: { priority: e.target.value },
                       })
                     }
-                    className="rounded-md border border-border px-2 py-1 text-sm"
+                    className="rounded-md border border-border px-2 py-1 text-sm disabled:opacity-60"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
