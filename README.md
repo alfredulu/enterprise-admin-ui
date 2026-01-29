@@ -53,7 +53,7 @@ The project focuses on real-world frontend and full-stack patterns including aut
   - `hooks/` → React Query mutations
   - `pages/` → UI composition
 - Optimistic UI patterns using TanStack Query
-- No client-side auth assumptions — all ownership enforced in the database
+- No client-side auth assumptions all ownership enforced in the database
 
 ---
 
