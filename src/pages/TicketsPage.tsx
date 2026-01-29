@@ -86,6 +86,9 @@ export default function TicketsPage() {
     return matchesStatus && matchesPriority && matchesSearch;
   });
 
+  const isFiltering =
+    search.trim() !== "" || filterStatus !== "all" || filterPriority !== "all";
+
   return (
     <div className="space-y-4">
       <div>
@@ -277,11 +280,20 @@ export default function TicketsPage() {
           </tbody>
         </table>
 
-        {(!data || data.length === 0) && (
+        {data && data.length === 0 && (
           <div className="p-4 text-sm text-muted-foreground">
-            No tickets found. Add some rows in Supabase.
+            No tickets yet. Create your first ticket.
           </div>
         )}
+
+        {data &&
+          data.length > 0 &&
+          filteredTickets.length === 0 &&
+          isFiltering && (
+            <div className="p-4 text-sm text-muted-foreground">
+              No tickets match your filters.
+            </div>
+          )}
       </div>
     </div>
   );
