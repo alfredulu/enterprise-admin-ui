@@ -28,6 +28,13 @@ export default function TicketsPage() {
   const [priority, setPriority] = useState("medium");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "open" | "in_progress" | "closed"
+  >("all");
+  const [filterPriority, setFilterPriority] = useState<
+    "all" | "low" | "medium" | "high"
+  >("all");
+  const [search, setSearch] = useState("");
 
   if (isLoading) {
     return (
@@ -65,6 +72,19 @@ export default function TicketsPage() {
     );
     setEditingId(null);
   }
+
+  const filteredTickets = (data ?? []).filter((t) => {
+    const matchesStatus = filterStatus === "all" || t.status === filterStatus;
+
+    const matchesPriority =
+      filterPriority === "all" || t.priority === filterPriority;
+
+    const matchesSearch =
+      search.trim() === "" ||
+      t.title.toLowerCase().includes(search.toLowerCase());
+
+    return matchesStatus && matchesPriority && matchesSearch;
+  });
 
   return (
     <div className="space-y-4">
@@ -124,6 +144,37 @@ export default function TicketsPage() {
         </button>
       </form>
 
+      <div className="flex flex-wrap gap-2 rounded-xl border border-border p-3">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by title…"
+          className="flex-1 rounded-md border border-border px-3 py-2 text-sm"
+        />
+
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value as any)}
+          className="rounded-md border border-border px-3 py-2 text-sm"
+        >
+          <option value="all">All Statuses</option>
+          <option value="open">Open</option>
+          <option value="in_progress">In Progress</option>
+          <option value="closed">Closed</option>
+        </select>
+
+        <select
+          value={filterPriority}
+          onChange={(e) => setFilterPriority(e.target.value as any)}
+          className="rounded-md border border-border px-3 py-2 text-sm"
+        >
+          <option value="all">All Priorities</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+
       <div className="overflow-hidden rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead className="bg-muted/60">
@@ -136,7 +187,7 @@ export default function TicketsPage() {
             </tr>
           </thead>
           <tbody>
-            {data?.map((t) => (
+            {filteredTickets.map((t) => (
               <tr
                 key={t.id}
                 className="border-t border-border [&>td]:px-4 [&>td]:py-3"
