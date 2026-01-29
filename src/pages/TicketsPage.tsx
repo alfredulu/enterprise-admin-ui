@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTickets } from "@/services/tickets";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
@@ -35,6 +35,7 @@ export default function TicketsPage() {
     "all" | "low" | "medium" | "high"
   >("all");
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   if (isLoading) {
     return (
@@ -80,14 +81,22 @@ export default function TicketsPage() {
       filterPriority === "all" || t.priority === filterPriority;
 
     const matchesSearch =
-      search.trim() === "" ||
-      t.title.toLowerCase().includes(search.toLowerCase());
+      debouncedSearch.trim() === "" ||
+      t.title.toLowerCase().includes(debouncedSearch.toLowerCase());
 
     return matchesStatus && matchesPriority && matchesSearch;
   });
 
   const isFiltering =
     search.trim() !== "" || filterStatus !== "all" || filterPriority !== "all";
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(id);
+  }, [search]);
 
   return (
     <div className="space-y-4">
