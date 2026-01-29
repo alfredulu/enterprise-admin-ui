@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTickets } from "@/services/tickets";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
@@ -18,13 +18,16 @@ export default function TicketsPage() {
     variables,
   } = useUpdateTicket();
 
-  const updatingId = isUpdating ? variables?.id : null;
+  const updatingId = isUpdating && variables?.id ? variables.id : null;
+  const [lockedId, setLockedId] = useState<string | null>(null);
 
   const { mutate: deleteTicket } = useDeleteTicket();
 
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState("open");
   const [priority, setPriority] = useState("medium");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draftTitle, setDraftTitle] = useState("");
 
   if (isLoading) {
     return (
@@ -40,6 +43,29 @@ export default function TicketsPage() {
     );
   }
 
+  function startEditing(id: string, currentTitle: string) {
+    setEditingId(id);
+    setDraftTitle(currentTitle);
+  }
+  function cancelEditing() {
+    setEditingId(null);
+    setDraftTitle("");
+  }
+  function saveTitle(id: string) {
+    const trimmed = draftTitle.trim();
+
+    if (!trimmed) return;
+
+    setLockedId(id);
+    updateTicket(
+      { id, updates: { title: trimmed } },
+      {
+        onSettled: () => setLockedId(null),
+      }
+    );
+    setEditingId(null);
+  }
+
   return (
     <div className="space-y-4">
       <div>
@@ -53,6 +79,7 @@ export default function TicketsPage() {
         onSubmit={(e) => {
           e.preventDefault();
           createTicket({ title, status, priority });
+          setTitle("");
           setStatus("open");
           setPriority("medium");
         }}
@@ -114,7 +141,36 @@ export default function TicketsPage() {
                 key={t.id}
                 className="border-t border-border [&>td]:px-4 [&>td]:py-3"
               >
-                <td className="font-medium">{t.title}</td>
+                <td className="font-medium">
+                  {editingId === t.id ? (
+                    <input
+                      value={draftTitle}
+                      onChange={(e) => setDraftTitle(e.target.value)}
+                      onBlur={() => saveTitle(t.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.currentTarget.blur(); // triggers onBlur -> save
+                        }
+                        if (e.key === "Escape") {
+                          cancelEditing();
+                        }
+                      }}
+                      disabled={lockedId === t.id}
+                      autoFocus
+                      className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => startEditing(t.id, t.title)}
+                      className="text-left hover:underline"
+                      disabled={updatingId === t.id}
+                      title="Click to edit title"
+                    >
+                      {t.title}
+                    </button>
+                  )}
+                </td>
                 <td>
                   <select
                     value={t.status}
