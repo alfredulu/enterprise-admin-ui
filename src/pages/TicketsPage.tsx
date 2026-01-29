@@ -10,6 +10,7 @@ type TicketsResponse = {
   tickets: Ticket[];
   total: number;
 };
+
 const PAGE_SIZE = 10;
 
 export default function TicketsPage() {
@@ -22,83 +23,36 @@ export default function TicketsPage() {
   } = useUpdateTicket();
 
   const updatingId = isUpdating && variables?.id ? variables.id : null;
-  const [lockedId, setLockedId] = useState<string | null>(null);
 
   const { mutate: deleteTicket } = useDeleteTicket();
+
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, isError, error } = useQuery<TicketsResponse>({
+  const { data, isPending, isError, error } = useQuery<TicketsResponse>({
     queryKey: ["tickets", page],
     queryFn: () => getTickets(page),
-    placeholderData: (previous) => previous,
+    placeholderData: (prev) => prev,
   });
 
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState("open");
   const [priority, setPriority] = useState("medium");
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
+
   const [filterStatus, setFilterStatus] = useState<
     "all" | "open" | "in_progress" | "closed"
   >("all");
+
   const [filterPriority, setFilterPriority] = useState<
     "all" | "low" | "medium" | "high"
   >("all");
+
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  if (isLoading) {
-    return (
-      <div className="text-sm text-muted-foreground">Loading tickets…</div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="text-sm text-destructive">
-        Error: {(error as Error).message}
-      </div>
-    );
-  }
-
-  function startEditing(id: string, currentTitle: string) {
-    setEditingId(id);
-    setDraftTitle(currentTitle);
-  }
-  function cancelEditing() {
-    setEditingId(null);
-    setDraftTitle("");
-  }
-  function saveTitle(id: string) {
-    const trimmed = draftTitle.trim();
-
-    if (!trimmed) return;
-
-    setLockedId(id);
-    updateTicket(
-      { id, updates: { title: trimmed } },
-      {
-        onSettled: () => setLockedId(null),
-      }
-    );
-    setEditingId(null);
-  }
-
-  const filteredTickets = (data?.tickets ?? []).filter((t) => {
-    const matchesStatus = filterStatus === "all" || t.status === filterStatus;
-
-    const matchesPriority =
-      filterPriority === "all" || t.priority === filterPriority;
-
-    const matchesSearch =
-      debouncedSearch.trim() === "" ||
-      t.title.toLowerCase().includes(debouncedSearch.toLowerCase());
-
-    return matchesStatus && matchesPriority && matchesSearch;
-  });
-
-  const isFiltering =
-    search.trim() !== "" || filterStatus !== "all" || filterPriority !== "all";
+  const [lockedId, setLockedId] = useState<string | null>(null);
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -111,6 +65,60 @@ export default function TicketsPage() {
   useEffect(() => {
     setPage(1);
   }, [filterStatus, filterPriority, debouncedSearch]);
+
+  function startEditing(id: string, currentTitle: string) {
+    setEditingId(id);
+    setDraftTitle(currentTitle);
+  }
+
+  function cancelEditing() {
+    setEditingId(null);
+    setDraftTitle("");
+  }
+
+  function saveTitle(id: string) {
+    const trimmed = draftTitle.trim();
+    if (!trimmed) return;
+
+    setLockedId(id);
+
+    updateTicket(
+      { id, updates: { title: trimmed } },
+      {
+        onSettled: () => setLockedId(null),
+      }
+    );
+
+    setEditingId(null);
+  }
+
+  const filteredTickets = (data?.tickets ?? []).filter((t) => {
+    const matchesStatus = filterStatus === "all" || t.status === filterStatus;
+    const matchesPriority =
+      filterPriority === "all" || t.priority === filterPriority;
+    const matchesSearch =
+      debouncedSearch.trim() === "" ||
+      t.title.toLowerCase().includes(debouncedSearch.toLowerCase());
+
+    return matchesStatus && matchesPriority && matchesSearch;
+  });
+
+  const isFiltering =
+    search.trim() !== "" || filterStatus !== "all" || filterPriority !== "all";
+
+  if (isPending) {
+    return (
+      <div className="text-sm text-muted-foreground">Loading tickets…</div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="text-sm text-destructive">
+        Error: {(error as Error).message}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
