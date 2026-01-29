@@ -4,12 +4,15 @@ import { getTickets } from "@/services/tickets";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
 import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 import { useDeleteTicket } from "@/hooks/useDeleteTicket";
+import type { Ticket } from "@/types/ticket";
+
+type TicketsResponse = {
+  tickets: Ticket[];
+  total: number;
+};
+const PAGE_SIZE = 10;
 
 export default function TicketsPage() {
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["tickets"],
-    queryFn: getTickets,
-  });
   const { mutate: createTicket, isPending: isCreating } = useCreateTicket();
 
   const {
@@ -22,6 +25,13 @@ export default function TicketsPage() {
   const [lockedId, setLockedId] = useState<string | null>(null);
 
   const { mutate: deleteTicket } = useDeleteTicket();
+  const [page, setPage] = useState(1);
+
+  const { data, isLoading, isError, error } = useQuery<TicketsResponse>({
+    queryKey: ["tickets", page],
+    queryFn: () => getTickets(page),
+    placeholderData: (previous) => previous,
+  });
 
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState("open");
@@ -74,7 +84,7 @@ export default function TicketsPage() {
     setEditingId(null);
   }
 
-  const filteredTickets = (data ?? []).filter((t) => {
+  const filteredTickets = (data?.tickets ?? []).filter((t) => {
     const matchesStatus = filterStatus === "all" || t.status === filterStatus;
 
     const matchesPriority =
@@ -97,6 +107,10 @@ export default function TicketsPage() {
 
     return () => clearTimeout(id);
   }, [search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filterStatus, filterPriority, debouncedSearch]);
 
   return (
     <div className="space-y-4">
@@ -289,14 +303,38 @@ export default function TicketsPage() {
           </tbody>
         </table>
 
-        {data && data.length === 0 && (
+        <div className="flex items-center justify-between p-4">
+          <span className="text-sm text-muted-foreground">
+            Page {page} of {Math.ceil((data?.total ?? 0) / PAGE_SIZE)}
+          </span>
+
+          <div className="flex gap-2">
+            <button
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="rounded-md border border-border px-3 py-1 text-sm disabled:opacity-50"
+            >
+              Previous
+            </button>
+
+            <button
+              disabled={page >= Math.ceil((data?.total ?? 0) / PAGE_SIZE)}
+              onClick={() => setPage((p) => p + 1)}
+              className="rounded-md border border-border px-3 py-1 text-sm disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        {data && data.tickets.length === 0 && (
           <div className="p-4 text-sm text-muted-foreground">
             No tickets yet. Create your first ticket.
           </div>
         )}
 
         {data &&
-          data.length > 0 &&
+          data.tickets.length > 0 &&
           filteredTickets.length === 0 &&
           isFiltering && (
             <div className="p-4 text-sm text-muted-foreground">
