@@ -89,7 +89,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div className="group relative rounded-xl border border-border bg-muted/40 p-5 transition hover:bg-muted/60">
           <p className="text-sm text-muted-foreground">Total Tickets</p>
           <p className="mt-2 text-4xl font-bold tracking-tight">{total}</p>
