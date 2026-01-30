@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 
 type LocationState = { from?: string } | null;
 
+const ADMIN_CONTACT_EMAIL = "elokaulu3328@gmail.com";
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,30 +40,23 @@ export default function LoginPage() {
     navigate(state?.from ?? "/dashboard", { replace: true });
   }
 
-  async function onSignUp() {
-    setError(null);
-    setLoading(true);
-
-    const { error } = await supabase.auth.signUp({ email, password });
-
-    setLoading(false);
-
-    if (error) {
-      setError(error.message);
-      return;
-    }
-
+  function onRequestAccess() {
     setError(
-      "Account created. Check your email (if confirmations are enabled)."
+      `Request access: This is an internal admin dashboard. Ask an administrator to create your account. Contact: ${ADMIN_CONTACT_EMAIL}`
     );
   }
 
   return (
     <div className="grid min-h-screen place-items-center bg-muted p-6">
       <Card className="w-full max-w-md">
-        <CardHeader>
+        <CardHeader className="space-y-1">
           <CardTitle>Sign in</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Internal enterprise admin dashboard. Accounts are created by an
+            administrator.
+          </p>
         </CardHeader>
+
         <CardContent className="space-y-3">
           <form className="space-y-3" onSubmit={onSignIn}>
             <Input
@@ -82,7 +77,9 @@ export default function LoginPage() {
             />
 
             {error ? (
-              <div className="text-sm text-destructive">{error}</div>
+              <div className="text-sm text-destructive whitespace-pre-line">
+                {error}
+              </div>
             ) : null}
 
             <Button className="w-full" disabled={loading} type="submit">
@@ -94,9 +91,10 @@ export default function LoginPage() {
             className="w-full"
             variant="secondary"
             disabled={loading}
-            onClick={onSignUp}
+            onClick={onRequestAccess}
+            type="button"
           >
-            Create account
+            Request access
           </Button>
         </CardContent>
       </Card>
