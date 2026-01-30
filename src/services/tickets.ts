@@ -40,6 +40,18 @@ export async function createTicket(input: CreateTicketInput): Promise<Ticket> {
 
   return data;
 }
+
+export async function getTicketById(id: string): Promise<Ticket> {
+  const { data, error } = await supabase
+    .from("tickets")
+    .select("id,title,status,priority,created_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return data as Ticket;
+}
+
 export async function updateTicket(
   id: string,
   updates: Partial<Pick<Ticket, "status" | "priority" | "title">>

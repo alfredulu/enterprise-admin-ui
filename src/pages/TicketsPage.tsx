@@ -5,6 +5,7 @@ import { useCreateTicket } from "@/hooks/useCreateTicket";
 import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 import { useDeleteTicket } from "@/hooks/useDeleteTicket";
 import type { Ticket } from "@/types/ticket";
+import { Link } from "react-router-dom";
 
 type TicketsResponse = {
   tickets: Ticket[];
@@ -245,15 +246,25 @@ export default function TicketsPage() {
                       className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
                     />
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => startEditing(t.id, t.title)}
-                      className="text-left hover:underline"
-                      disabled={updatingId === t.id}
-                      title="Click to edit title"
-                    >
-                      {t.title}
-                    </button>
+                    <div className="flex items-center justify-between gap-3">
+                      <Link
+                        to={`/tickets/${t.id}`}
+                        className="min-w-0 flex-1 truncate text-left font-medium hover:underline"
+                        title="Open ticket details"
+                      >
+                        {t.title}
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => startEditing(t.id, t.title)}
+                        disabled={updatingId === t.id}
+                        className="shrink-0 rounded-md border border-border px-2 py-1 text-xs hover:bg-muted disabled:opacity-60"
+                        title="Edit title"
+                      >
+                        ✎
+                      </button>
+                    </div>
                   )}
                 </td>
                 <td>
