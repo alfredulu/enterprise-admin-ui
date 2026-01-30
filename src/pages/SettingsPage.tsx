@@ -1,17 +1,13 @@
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/features/auth/useSession";
+import { useLogoutConfirm } from "@/app/LogoutConfirmContext";
 
 export default function SettingsPage() {
+  const { requestLogout } = useLogoutConfirm();
+
   const { session } = useSession();
 
   const user = session?.user;
-
-  async function handleLogout() {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      alert("Failed to log out");
-    }
-  }
 
   async function handlePasswordReset() {
     if (!user?.email) return;
@@ -59,7 +55,7 @@ export default function SettingsPage() {
           </button>
 
           <button
-            onClick={handleLogout}
+            onClick={requestLogout}
             className="rounded-md border border-destructive px-4 py-2 text-sm text-destructive hover:bg-destructive/10"
           >
             Log out

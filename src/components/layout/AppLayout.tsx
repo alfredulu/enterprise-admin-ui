@@ -92,7 +92,7 @@ export default function AppLayout() {
                       className="rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
                       title="Toggle theme"
                     >
-                      {theme === "dark" ? "Dark" : "Light"}
+                      {theme === "dark" ? "Light" : "Dark"}
                     </button>
 
                     <Button
