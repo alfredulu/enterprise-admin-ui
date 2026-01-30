@@ -8,9 +8,18 @@ import TicketDetailsPage from "@/pages/TicketDetailsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import ProtectedRoute from "@/app/ProtectedRoute";
 import { useSession } from "@/features/auth/useSession";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function App() {
   const { isAuthed, loading } = useSession();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!loading) {
+      queryClient.clear();
+    }
+  }, [isAuthed, loading, queryClient]);
 
   return (
     <Routes>
