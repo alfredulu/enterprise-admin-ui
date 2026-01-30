@@ -54,8 +54,7 @@ export default function LoginPage() {
         <CardHeader className="space-y-1">
           <CardTitle>Sign in</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Internal enterprise admin dashboard. Accounts are created by an
-            administrator.
+            Internal. Accounts are created by an administrator.
           </p>
         </CardHeader>
 

@@ -73,6 +73,13 @@ export default function AppLayout() {
             </header>
 
             <main className="min-w-0 flex-1 p-4 md:p-6">
+              <div className="mb-6">
+                <h1 className="text-xl font-semibold">Enterprise Admin UI</h1>
+                <p className="text-sm text-muted-foreground">
+                  Internal dashboard for managing tickets, users, and system
+                  settings.
+                </p>
+              </div>
               <Outlet />
             </main>
           </div>
