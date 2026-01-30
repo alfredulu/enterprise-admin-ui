@@ -41,7 +41,7 @@ export async function createTicket(input: CreateTicketInput): Promise<Ticket> {
   return data;
 }
 
-export async function getTicketById(id: string): Promise<Ticket> {
+export async function getTicketById(id: string): Promise<Ticket | null> {
   const { data, error } = await supabase
     .from("tickets")
     .select("id,title,status,priority,created_at")
@@ -49,7 +49,7 @@ export async function getTicketById(id: string): Promise<Ticket> {
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  return data as Ticket;
+  return (data ?? null) as Ticket | null;
 }
 
 export async function updateTicket(

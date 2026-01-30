@@ -6,6 +6,7 @@ import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 import { useDeleteTicket } from "@/hooks/useDeleteTicket";
 import type { Ticket } from "@/types/ticket";
 import { Link } from "react-router-dom";
+import { Pencil, X, Check } from "lucide-react";
 
 type TicketsResponse = {
   tickets: Ticket[];
@@ -229,44 +230,60 @@ export default function TicketsPage() {
               >
                 <td className="font-medium">
                   {editingId === t.id ? (
-                    <input
-                      value={draftTitle}
-                      onChange={(e) => setDraftTitle(e.target.value)}
-                      onBlur={() => saveTitle(t.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.currentTarget.blur(); // triggers onBlur -> save
-                        }
-                        if (e.key === "Escape") {
-                          cancelEditing();
-                        }
-                      }}
-                      disabled={lockedId === t.id}
-                      autoFocus
-                      className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
-                    />
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={draftTitle}
+                        onChange={(e) => setDraftTitle(e.target.value)}
+                        disabled={lockedId === t.id}
+                        autoFocus
+                        className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => saveTitle(t.id)}
+                        disabled={lockedId === t.id}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                        title="Save"
+                      >
+                        <Check className="h-4 w-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={cancelEditing}
+                        disabled={lockedId === t.id}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                        title="Cancel"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
                   ) : (
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center justify-between gap-2">
+                      {/* Title is now a link to details */}
                       <Link
                         to={`/tickets/${t.id}`}
-                        className="min-w-0 flex-1 truncate text-left font-medium hover:underline"
+                        className="min-w-0 flex-1 truncate text-left hover:underline"
                         title="Open ticket details"
                       >
                         {t.title}
                       </Link>
 
+                      {/* Edit button */}
                       <button
                         type="button"
                         onClick={() => startEditing(t.id, t.title)}
                         disabled={updatingId === t.id}
-                        className="shrink-0 rounded-md border border-border px-2 py-1 text-xs hover:bg-muted disabled:opacity-60"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
                         title="Edit title"
                       >
-                        ✎
+                        <Pencil className="h-4 w-4" />
                       </button>
                     </div>
                   )}
                 </td>
+
                 <td>
                   <select
                     value={t.status}
