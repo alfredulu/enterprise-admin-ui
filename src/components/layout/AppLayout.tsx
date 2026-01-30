@@ -45,7 +45,7 @@ export default function AppLayout() {
   return (
     <LogoutConfirmProvider value={{ requestLogout }}>
       <div className="min-h-screen bg-muted text-foreground p-6 md:p-8">
-        <div className="mx-auto w-full max-w-7xl rounded-2xl border border-border bg-background shadow-lg">
+        <div className="mx-auto w-full max-w-7xl overflow-hidden rounded-2xl border border-border bg-background shadow-lg">
           <div className="grid min-h-[calc(100vh-3rem)] grid-cols-1 md:grid-cols-[260px_1fr]">
             {/* Sidebar */}
             <aside className="border-b border-border bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] md:border-b-0 md:border-r">
