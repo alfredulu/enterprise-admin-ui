@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 
 type LocationState = { from?: string } | null;
 
-const ADMIN_CONTACT_EMAIL = "elokaulu3328@gmail.com";
+const ADMIN_CONTACT_EMAIL =
+  (import.meta.env.VITE_ADMIN_CONTACT_EMAIL as string | undefined) ??
+  "admin@company.com";
 
 export default function LoginPage() {
   const navigate = useNavigate();
