@@ -183,171 +183,172 @@ export default function TicketsPage() {
       </CardSection>
 
       {/* Filters */}
+      {/* Filters */}
       <CardSection>
-        <div className="flex flex-col gap-2 md:flex-row md:items-center">
+        <div className="grid gap-2 sm:grid-cols-3">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title…"
-            className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           />
 
-          <div className="flex gap-2">
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="all">All Statuses</option>
-              <option value="open">Open</option>
-              <option value="in_progress">In Progress</option>
-              <option value="closed">Closed</option>
-            </select>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as any)}
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="all">All Statuses</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="closed">Closed</option>
+          </select>
 
-            <select
-              value={filterPriority}
-              onChange={(e) => setFilterPriority(e.target.value as any)}
-              className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="all">All Priorities</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
+          <select
+            value={filterPriority}
+            onChange={(e) => setFilterPriority(e.target.value as any)}
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="all">All Priorities</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
         </div>
       </CardSection>
 
       {/* Table */}
-      <CardSection className="p-0 overflow-hidden">
-        <table className="w-full text-sm tickets-table">
-          <thead className="bg-muted/70 text-muted-foreground">
-            <tr className="[&>th]:px-4 [&>th]:py-3 [&>th]:text-left [&>th]:font-medium">
-              <th>Title</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Created</th>
-              <th className="w-30 text-right">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredTickets.map((t) => (
-              <tr
-                key={t.id}
-                className="border-t border-border transition-colors [&>td]:px-4 [&>td]:py-3"
-              >
-                <td className="font-medium">
-                  {editingId === t.id ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        value={draftTitle}
-                        onChange={(e) => setDraftTitle(e.target.value)}
-                        disabled={lockedId === t.id}
-                        autoFocus
-                        className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() => saveTitle(t.id)}
-                        disabled={lockedId === t.id}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
-                        title="Save"
-                      >
-                        <Check className="h-4 w-4" />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={cancelEditing}
-                        disabled={lockedId === t.id}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
-                        title="Cancel"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between gap-2">
-                      <Link
-                        to={`/tickets/${t.id}`}
-                        className="min-w-0 flex-1 truncate text-left hover:underline"
-                        title="Open ticket details"
-                      >
-                        {t.title}
-                      </Link>
-
-                      <button
-                        type="button"
-                        onClick={() => startEditing(t.id, t.title)}
-                        disabled={updatingId === t.id}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
-                        title="Edit title"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
-                </td>
-
-                <td>
-                  <select
-                    value={t.status}
-                    disabled={updatingId === t.id}
-                    onChange={(e) =>
-                      updateTicket({
-                        id: t.id,
-                        updates: { status: e.target.value },
-                      })
-                    }
-                    className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
-                  >
-                    <option value="open">Open</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="closed">Closed</option>
-                  </select>
-                </td>
-
-                <td>
-                  <select
-                    value={t.priority}
-                    disabled={updatingId === t.id}
-                    onChange={(e) =>
-                      updateTicket({
-                        id: t.id,
-                        updates: { priority: e.target.value },
-                      })
-                    }
-                    className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </td>
-
-                <td className="text-muted-foreground">
-                  {new Date(t.created_at).toLocaleString()}
-                </td>
-
-                <td className="text-right">
-                  <button
-                    disabled={updatingId === t.id}
-                    onClick={() => {
-                      if (confirm("Delete this ticket?")) {
-                        deleteTicket(t.id);
-                      }
-                    }}
-                    className="text-sm text-destructive hover:underline disabled:opacity-60"
-                  >
-                    Delete
-                  </button>
-                </td>
+      <CardSection className="p-0">
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-225 w-full text-sm tickets-table">
+            <thead className="bg-muted/70 text-muted-foreground">
+              <tr className="[&>th]:px-4 [&>th]:py-3 [&>th]:text-left [&>th]:font-medium">
+                <th>Title</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Created</th>
+                <th className="w-30 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {filteredTickets.map((t) => (
+                <tr
+                  key={t.id}
+                  className="border-t border-border transition-colors [&>td]:px-4 [&>td]:py-3"
+                >
+                  <td className="font-medium">
+                    {editingId === t.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          value={draftTitle}
+                          onChange={(e) => setDraftTitle(e.target.value)}
+                          disabled={lockedId === t.id}
+                          autoFocus
+                          className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => saveTitle(t.id)}
+                          disabled={lockedId === t.id}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                          title="Save"
+                        >
+                          <Check className="h-4 w-4" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={cancelEditing}
+                          disabled={lockedId === t.id}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                          title="Cancel"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between gap-2">
+                        <Link
+                          to={`/tickets/${t.id}`}
+                          className="min-w-0 flex-1 truncate text-left hover:underline"
+                          title="Open ticket details"
+                        >
+                          {t.title}
+                        </Link>
+
+                        <button
+                          type="button"
+                          onClick={() => startEditing(t.id, t.title)}
+                          disabled={updatingId === t.id}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                          title="Edit title"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                  </td>
+
+                  <td>
+                    <select
+                      value={t.status}
+                      disabled={updatingId === t.id}
+                      onChange={(e) =>
+                        updateTicket({
+                          id: t.id,
+                          updates: { status: e.target.value },
+                        })
+                      }
+                      className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
+                    >
+                      <option value="open">Open</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="closed">Closed</option>
+                    </select>
+                  </td>
+
+                  <td>
+                    <select
+                      value={t.priority}
+                      disabled={updatingId === t.id}
+                      onChange={(e) =>
+                        updateTicket({
+                          id: t.id,
+                          updates: { priority: e.target.value },
+                        })
+                      }
+                      className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                  </td>
+
+                  <td className="text-muted-foreground">
+                    {new Date(t.created_at).toLocaleString()}
+                  </td>
+
+                  <td className="text-right">
+                    <button
+                      disabled={updatingId === t.id}
+                      onClick={() => {
+                        if (confirm("Delete this ticket?")) {
+                          deleteTicket(t.id);
+                        }
+                      }}
+                      className="text-sm text-destructive hover:underline disabled:opacity-60"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {/* Footer / pagination */}
         <div className="flex flex-col gap-3 border-t border-border p-4 sm:flex-row sm:items-center sm:justify-between">
