@@ -167,10 +167,9 @@ src/
 
 `npm run dev`
 
-### 3️⃣ Create an .env file:
+### 3️⃣ Create a .env file:
 
 ```VITE_SUPABASE_URL=your_supabase_url
-
 VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 
