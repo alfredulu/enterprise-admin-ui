@@ -169,9 +169,8 @@ src/
 
 ### 3️⃣ Create a .env file:
 
-```VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
-```
+`VITE_SUPABASE_URL=your_supabase_url`
+`VITE_SUPABASE_ANON_KEY=your_anon_key`
 
 ---
 
@@ -197,8 +196,8 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 
 - 📱 Mobile-first navigation refinement
 
---
+---
 
-## License
+## ⚖️ License
 
-### MIT
+### 📜 MIT
