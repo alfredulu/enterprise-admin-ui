@@ -46,7 +46,10 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       spacing: {
-        225: "56.25rem", // 900px
+        30: "120px",
+        35: "140px",
+        45: "180px",
+        225: "56.25rem",
       },
     },
   },

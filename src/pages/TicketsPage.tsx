@@ -8,8 +8,14 @@ import { Link } from "react-router-dom";
 import { Pencil, X, Check } from "lucide-react";
 import { Page, PageHeader, CardSection } from "@/components/ui/page";
 import type { TicketsResponse } from "@/services/tickets";
-
 import { PAGE_SIZE } from "@/services/tickets";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function TicketsPage() {
   const { mutate: createTicket, isPending: isCreating } = useCreateTicket();
@@ -151,25 +157,31 @@ export default function TicketsPage() {
           />
 
           <div className="flex flex-col gap-2 sm:flex-row">
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="open">Open</option>
-              <option value="in_progress">In Progress</option>
-              <option value="closed">Closed</option>
-            </select>
+            <div className="flex-1">
+              <Select value={status} onValueChange={(v) => setStatus(v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Open</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+            <div className="flex-1">
+              <Select value={priority} onValueChange={(v) => setPriority(v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <button
               type="submit"
@@ -183,51 +195,81 @@ export default function TicketsPage() {
       </CardSection>
 
       {/* Filters */}
-      {/* Filters */}
-      <CardSection>
-        <div className="grid gap-2 sm:grid-cols-3">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title…"
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
+      <CardSection className="p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by title…"
+              className="h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
 
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          >
-            <option value="all">All Statuses</option>
-            <option value="open">Open</option>
-            <option value="in_progress">In Progress</option>
-            <option value="closed">Closed</option>
-          </select>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+              <div className="min-w-45">
+                <Select
+                  value={filterStatus}
+                  onValueChange={(v) => setFilterStatus(v as any)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="open">Open</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="closed">Closed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <select
-            value={filterPriority}
-            onChange={(e) => setFilterPriority(e.target.value as any)}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          >
-            <option value="all">All Priorities</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
+              <div className="min-w-45">
+                <Select
+                  value={filterPriority}
+                  onValueChange={(v) => setFilterPriority(v as any)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Priorities</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {isFiltering ? (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setFilterStatus("all");
+                setFilterPriority("all");
+              }}
+              className="h-10 rounded-md border border-border bg-background px-3 text-sm shadow-sm hover:bg-muted"
+            >
+              Clear filters
+            </button>
+          ) : null}
         </div>
       </CardSection>
 
       {/* Table */}
-      <CardSection className="p-0">
-        <div className="w-full overflow-x-auto">
-          <table className="min-w-225 w-full text-sm tickets-table">
+      <CardSection className="p-0 overflow-hidden">
+        {/* Horizontal scroll only for the table area */}
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-225 text-sm tickets-table">
             <thead className="bg-muted/70 text-muted-foreground">
               <tr className="[&>th]:px-4 [&>th]:py-3 [&>th]:text-left [&>th]:font-medium">
                 <th>Title</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Created</th>
-                <th className="w-30 text-right">Actions</th>
+                <th className="whitespace-nowrap">Status</th>
+                <th className="whitespace-nowrap">Priority</th>
+                <th className="whitespace-nowrap">Created</th>
+                <th className="w-30 text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
 
@@ -245,14 +287,14 @@ export default function TicketsPage() {
                           onChange={(e) => setDraftTitle(e.target.value)}
                           disabled={lockedId === t.id}
                           autoFocus
-                          className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
+                          className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
                         />
 
                         <button
                           type="button"
                           onClick={() => saveTitle(t.id)}
                           disabled={lockedId === t.id}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background shadow-sm hover:bg-muted disabled:opacity-50"
                           title="Save"
                         >
                           <Check className="h-4 w-4" />
@@ -262,7 +304,7 @@ export default function TicketsPage() {
                           type="button"
                           onClick={cancelEditing}
                           disabled={lockedId === t.id}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background shadow-sm hover:bg-muted disabled:opacity-50"
                           title="Cancel"
                         >
                           <X className="h-4 w-4" />
@@ -282,7 +324,7 @@ export default function TicketsPage() {
                           type="button"
                           onClick={() => startEditing(t.id, t.title)}
                           disabled={updatingId === t.id}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background shadow-sm hover:bg-muted disabled:opacity-50"
                           title="Edit title"
                         >
                           <Pencil className="h-4 w-4" />
@@ -292,42 +334,50 @@ export default function TicketsPage() {
                   </td>
 
                   <td>
-                    <select
-                      value={t.status}
-                      disabled={updatingId === t.id}
-                      onChange={(e) =>
-                        updateTicket({
-                          id: t.id,
-                          updates: { status: e.target.value },
-                        })
-                      }
-                      className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
-                    >
-                      <option value="open">Open</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="closed">Closed</option>
-                    </select>
+                    <div className="min-w-35">
+                      <Select
+                        value={t.status}
+                        onValueChange={(v) =>
+                          updateTicket({ id: t.id, updates: { status: v } })
+                        }
+                        disabled={updatingId === t.id}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="open">Open</SelectItem>
+                          <SelectItem value="in_progress">
+                            In Progress
+                          </SelectItem>
+                          <SelectItem value="closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </td>
 
                   <td>
-                    <select
-                      value={t.priority}
-                      disabled={updatingId === t.id}
-                      onChange={(e) =>
-                        updateTicket({
-                          id: t.id,
-                          updates: { priority: e.target.value },
-                        })
-                      }
-                      className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
-                    >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                    </select>
+                    <div className="min-w-35">
+                      <Select
+                        value={t.priority}
+                        onValueChange={(v) =>
+                          updateTicket({ id: t.id, updates: { priority: v } })
+                        }
+                        disabled={updatingId === t.id}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </td>
 
-                  <td className="text-muted-foreground">
+                  <td className="whitespace-nowrap text-muted-foreground">
                     {new Date(t.created_at).toLocaleString()}
                   </td>
 
@@ -339,7 +389,8 @@ export default function TicketsPage() {
                           deleteTicket(t.id);
                         }
                       }}
-                      className="text-sm text-destructive hover:underline disabled:opacity-60"
+                      className="inline-flex h-9 items-center justify-center rounded-md border border-destructive/30 bg-background px-3 text-sm text-destructive shadow-sm hover:bg-destructive/10 disabled:opacity-60"
+                      title="Delete ticket"
                     >
                       Delete
                     </button>
@@ -360,7 +411,7 @@ export default function TicketsPage() {
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
-              className="rounded-md border border-border px-3 py-1 text-sm hover:bg-muted disabled:opacity-50"
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm shadow-sm hover:bg-muted disabled:opacity-50"
             >
               Previous
             </button>
@@ -368,7 +419,7 @@ export default function TicketsPage() {
             <button
               disabled={page >= Math.ceil((data?.total ?? 0) / PAGE_SIZE)}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded-md border border-border px-3 py-1 text-sm hover:bg-muted disabled:opacity-50"
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm shadow-sm hover:bg-muted disabled:opacity-50"
             >
               Next
             </button>
@@ -377,7 +428,7 @@ export default function TicketsPage() {
 
         {/* Empty states */}
         {data && data.tickets.length === 0 ? (
-          <div className="p-8 text-center text-sm text-muted-foreground">
+          <div className="p-10 text-center text-sm text-muted-foreground">
             No tickets yet. Create your first ticket.
           </div>
         ) : null}
@@ -386,7 +437,7 @@ export default function TicketsPage() {
         data.tickets.length > 0 &&
         filteredTickets.length === 0 &&
         isFiltering ? (
-          <div className="p-8 text-center text-sm text-muted-foreground">
+          <div className="p-10 text-center text-sm text-muted-foreground">
             No tickets match your filters.
           </div>
         ) : null}
