@@ -9,7 +9,7 @@ import { Pencil, X, Check } from "lucide-react";
 import { Page, PageHeader, CardSection } from "@/components/ui/page";
 import type { TicketsResponse } from "@/services/tickets";
 
-const PAGE_SIZE = 10;
+import { PAGE_SIZE } from "@/services/tickets";
 
 export default function TicketsPage() {
   const { mutate: createTicket, isPending: isCreating } = useCreateTicket();

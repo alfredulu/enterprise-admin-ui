@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { Ticket } from "@/types/ticket";
 
-const PAGE_SIZE = 10;
+export const PAGE_SIZE = 10;
 
 /** ---------- Tickets list (paged) ---------- */
 export type TicketsResponse = {
