@@ -4,15 +4,10 @@ import { getTickets } from "@/services/tickets";
 import { useCreateTicket } from "@/hooks/useCreateTicket";
 import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 import { useDeleteTicket } from "@/hooks/useDeleteTicket";
-import type { Ticket } from "@/types/ticket";
 import { Link } from "react-router-dom";
 import { Pencil, X, Check } from "lucide-react";
 import { Page, PageHeader, CardSection } from "@/components/ui/page";
-
-type TicketsResponse = {
-  tickets: Ticket[];
-  total: number;
-};
+import type { TicketsResponse } from "@/services/tickets";
 
 const PAGE_SIZE = 10;
 

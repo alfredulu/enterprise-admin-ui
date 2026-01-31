@@ -1,13 +1,21 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTicket } from "@/services/tickets";
 
+type CreateTicketInput = {
+  title: string;
+  status: string;
+  priority: string;
+};
+
 export function useCreateTicket() {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: createTicket,
+    mutationFn: (input: CreateTicketInput) => createTicket(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      // refresh tickets list (all pages)
+      qc.invalidateQueries({ queryKey: ["tickets"] });
+      qc.invalidateQueries({ queryKey: ["ticket_stats"] });
     },
   });
 }
