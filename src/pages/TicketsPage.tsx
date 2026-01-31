@@ -225,14 +225,14 @@ export default function TicketsPage() {
 
       {/* Table */}
       <CardSection className="p-0 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/60">
+        <table className="w-full text-sm tickets-table">
+          <thead className="bg-muted/70 text-muted-foreground">
             <tr className="[&>th]:px-4 [&>th]:py-3 [&>th]:text-left [&>th]:font-medium">
               <th>Title</th>
               <th>Status</th>
               <th>Priority</th>
               <th>Created</th>
-              <th className="w-30">Actions</th>
+              <th className="w-30 text-right">Actions</th>
             </tr>
           </thead>
 
@@ -240,7 +240,7 @@ export default function TicketsPage() {
             {filteredTickets.map((t) => (
               <tr
                 key={t.id}
-                className="border-t border-border hover:bg-muted/30 transition-colors [&>td]:px-4 [&>td]:py-3"
+                className="border-t border-border transition-colors [&>td]:px-4 [&>td]:py-3"
               >
                 <td className="font-medium">
                   {editingId === t.id ? (
@@ -336,7 +336,7 @@ export default function TicketsPage() {
                   {new Date(t.created_at).toLocaleString()}
                 </td>
 
-                <td>
+                <td className="text-right">
                   <button
                     disabled={updatingId === t.id}
                     onClick={() => {
@@ -381,7 +381,7 @@ export default function TicketsPage() {
 
         {/* Empty states */}
         {data && data.tickets.length === 0 ? (
-          <div className="p-4 text-sm text-muted-foreground">
+          <div className="p-8 text-center text-sm text-muted-foreground">
             No tickets yet. Create your first ticket.
           </div>
         ) : null}
@@ -390,7 +390,7 @@ export default function TicketsPage() {
         data.tickets.length > 0 &&
         filteredTickets.length === 0 &&
         isFiltering ? (
-          <div className="p-4 text-sm text-muted-foreground">
+          <div className="p-8 text-center text-sm text-muted-foreground">
             No tickets match your filters.
           </div>
         ) : null}
