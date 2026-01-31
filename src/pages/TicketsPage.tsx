@@ -7,6 +7,7 @@ import { useDeleteTicket } from "@/hooks/useDeleteTicket";
 import type { Ticket } from "@/types/ticket";
 import { Link } from "react-router-dom";
 import { Pencil, X, Check } from "lucide-react";
+import { Page, PageHeader, CardSection } from "@/components/ui/page";
 
 type TicketsResponse = {
   tickets: Ticket[];
@@ -30,7 +31,12 @@ export default function TicketsPage() {
 
   const [page, setPage] = useState(1);
 
-  const { data, isPending, isError, error } = useQuery<TicketsResponse>({
+  const {
+    data,
+    isPending: isLoadingTickets,
+    isError,
+    error,
+  } = useQuery<TicketsResponse>({
     queryKey: ["tickets", page],
     queryFn: () => getTickets(page),
     placeholderData: (prev) => prev,
@@ -108,7 +114,7 @@ export default function TicketsPage() {
   const isFiltering =
     search.trim() !== "" || filterStatus !== "all" || filterPriority !== "all";
 
-  if (isPending) {
+  if (isLoadingTickets) {
     return (
       <div className="text-sm text-muted-foreground">Loading tickets…</div>
     );
@@ -123,95 +129,102 @@ export default function TicketsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold">Tickets</h1>
-        <p className="text-sm text-muted-foreground">
-          Tickets loaded from Supabase.
-        </p>
-      </div>
+    <Page>
+      <PageHeader
+        title="Tickets"
+        description="Create, search, and manage support tickets."
+      />
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          createTicket({ title, status, priority });
-          setTitle("");
-          setStatus("open");
-          setPriority("medium");
-        }}
-        className="space-y-2 rounded-xl border border-border p-4"
-      >
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Ticket title"
-          required
-          className="w-full rounded-md border border-border px-3 py-2 text-sm"
-        />
+      {/* Create ticket */}
+      <CardSection>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            createTicket({ title, status, priority });
+            setTitle("");
+            setStatus("open");
+            setPriority("medium");
+          }}
+          className="space-y-3"
+        >
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Ticket title"
+            required
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+          />
 
-        <div className="flex gap-2">
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="flex-1 rounded-md border border-border px-3 py-2 text-sm"
-          >
-            <option value="open">Open</option>
-            <option value="in_progress">In Progress</option>
-            <option value="closed">Closed</option>
-          </select>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="closed">Closed</option>
+            </select>
 
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-            className="flex-1 rounded-md border border-border px-3 py-2 text-sm"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+
+            <button
+              type="submit"
+              disabled={isCreating}
+              className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+            >
+              {isCreating ? "Creating…" : "Create Ticket"}
+            </button>
+          </div>
+        </form>
+      </CardSection>
+
+      {/* Filters */}
+      <CardSection>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by title…"
+            className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+          />
+
+          <div className="flex gap-2">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as any)}
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">All Statuses</option>
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="closed">Closed</option>
+            </select>
+
+            <select
+              value={filterPriority}
+              onChange={(e) => setFilterPriority(e.target.value as any)}
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">All Priorities</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
         </div>
+      </CardSection>
 
-        <button
-          type="submit"
-          disabled={isCreating}
-          className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
-        >
-          {isCreating ? "Creating…" : "Create Ticket"}
-        </button>
-      </form>
-
-      <div className="flex flex-wrap gap-2 rounded-xl border border-border p-3">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by title…"
-          className="flex-1 rounded-md border border-border px-3 py-2 text-sm"
-        />
-
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as any)}
-          className="rounded-md border border-border px-3 py-2 text-sm"
-        >
-          <option value="all">All Statuses</option>
-          <option value="open">Open</option>
-          <option value="in_progress">In Progress</option>
-          <option value="closed">Closed</option>
-        </select>
-
-        <select
-          value={filterPriority}
-          onChange={(e) => setFilterPriority(e.target.value as any)}
-          className="rounded-md border border-border px-3 py-2 text-sm"
-        >
-          <option value="all">All Priorities</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-      </div>
-
-      <div className="overflow-hidden rounded-xl border border-border">
+      {/* Table */}
+      <CardSection className="p-0 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/60">
             <tr className="[&>th]:px-4 [&>th]:py-3 [&>th]:text-left [&>th]:font-medium">
@@ -219,14 +232,15 @@ export default function TicketsPage() {
               <th>Status</th>
               <th>Priority</th>
               <th>Created</th>
-              <th>Actions</th>
+              <th className="w-30">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {filteredTickets.map((t) => (
               <tr
                 key={t.id}
-                className="border-t border-border [&>td]:px-4 [&>td]:py-3"
+                className="border-t border-border hover:bg-muted/30 transition-colors [&>td]:px-4 [&>td]:py-3"
               >
                 <td className="font-medium">
                   {editingId === t.id ? (
@@ -261,7 +275,6 @@ export default function TicketsPage() {
                     </div>
                   ) : (
                     <div className="flex items-center justify-between gap-2">
-                      {/* Title is now a link to details */}
                       <Link
                         to={`/tickets/${t.id}`}
                         className="min-w-0 flex-1 truncate text-left hover:underline"
@@ -270,7 +283,6 @@ export default function TicketsPage() {
                         {t.title}
                       </Link>
 
-                      {/* Edit button */}
                       <button
                         type="button"
                         onClick={() => startEditing(t.id, t.title)}
@@ -294,13 +306,14 @@ export default function TicketsPage() {
                         updates: { status: e.target.value },
                       })
                     }
-                    className="rounded-md border border-border px-2 py-1 text-sm disabled:opacity-60"
+                    className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
                   >
                     <option value="open">Open</option>
                     <option value="in_progress">In Progress</option>
                     <option value="closed">Closed</option>
                   </select>
                 </td>
+
                 <td>
                   <select
                     value={t.priority}
@@ -311,16 +324,18 @@ export default function TicketsPage() {
                         updates: { priority: e.target.value },
                       })
                     }
-                    className="rounded-md border border-border px-2 py-1 text-sm disabled:opacity-60"
+                    className="rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-60"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
                     <option value="high">High</option>
                   </select>
                 </td>
+
                 <td className="text-muted-foreground">
                   {new Date(t.created_at).toLocaleString()}
                 </td>
+
                 <td>
                   <button
                     disabled={updatingId === t.id}
@@ -339,7 +354,8 @@ export default function TicketsPage() {
           </tbody>
         </table>
 
-        <div className="flex items-center justify-between p-4">
+        {/* Footer / pagination */}
+        <div className="flex flex-col gap-3 border-t border-border p-4 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm text-muted-foreground">
             Page {page} of {Math.ceil((data?.total ?? 0) / PAGE_SIZE)}
           </span>
@@ -348,7 +364,7 @@ export default function TicketsPage() {
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
-              className="rounded-md border border-border px-3 py-1 text-sm disabled:opacity-50"
+              className="rounded-md border border-border px-3 py-1 text-sm hover:bg-muted disabled:opacity-50"
             >
               Previous
             </button>
@@ -356,28 +372,29 @@ export default function TicketsPage() {
             <button
               disabled={page >= Math.ceil((data?.total ?? 0) / PAGE_SIZE)}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded-md border border-border px-3 py-1 text-sm disabled:opacity-50"
+              className="rounded-md border border-border px-3 py-1 text-sm hover:bg-muted disabled:opacity-50"
             >
               Next
             </button>
           </div>
         </div>
 
-        {data && data.tickets.length === 0 && (
+        {/* Empty states */}
+        {data && data.tickets.length === 0 ? (
           <div className="p-4 text-sm text-muted-foreground">
             No tickets yet. Create your first ticket.
           </div>
-        )}
+        ) : null}
 
         {data &&
-          data.tickets.length > 0 &&
-          filteredTickets.length === 0 &&
-          isFiltering && (
-            <div className="p-4 text-sm text-muted-foreground">
-              No tickets match your filters.
-            </div>
-          )}
-      </div>
-    </div>
+        data.tickets.length > 0 &&
+        filteredTickets.length === 0 &&
+        isFiltering ? (
+          <div className="p-4 text-sm text-muted-foreground">
+            No tickets match your filters.
+          </div>
+        ) : null}
+      </CardSection>
+    </Page>
   );
 }
