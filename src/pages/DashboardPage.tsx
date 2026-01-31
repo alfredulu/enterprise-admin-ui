@@ -167,22 +167,22 @@ export default function DashboardPage() {
 
       {/* Stats cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-border bg-background p-5 shadow-sm">
+        <div className="rounded-2xl border border-border bg-background p-5 shadow-sm transition-shadow hover:shadow-md">
           <p className="text-sm text-muted-foreground">Total Tickets</p>
           <p className="mt-2 text-3xl font-semibold">{stats.total}</p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-background p-5 shadow-sm">
+        <div className="rounded-2xl border border-border bg-background p-5 shadow-sm transition-shadow hover:shadow-md">
           <p className="text-sm text-muted-foreground">Open</p>
           <p className="mt-2 text-3xl font-semibold">{stats.open}</p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-background p-5 shadow-sm">
+        <div className="rounded-2xl border border-border bg-background p-5 shadow-sm transition-shadow hover:shadow-md">
           <p className="text-sm text-muted-foreground">In Progress</p>
           <p className="mt-2 text-3xl font-semibold">{stats.in_progress}</p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-background p-5 shadow-sm">
+        <div className="rounded-2xl border border-border bg-background p-5 shadow-sm transition-shadow hover:shadow-md">
           <p className="text-sm text-muted-foreground">Closed</p>
           <p className="mt-2 text-3xl font-semibold">{stats.closed}</p>
         </div>
@@ -191,7 +191,7 @@ export default function DashboardPage() {
       {/* 4 visuals */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* (1) Donut */}
-        <CardSection className="p-5">
+        <CardSection className="p-5 shadow-sm transition-shadow hover:shadow-md">
           <div className="mb-3">
             <h2 className="text-sm font-medium">Status breakdown</h2>
             <p className="text-xs text-muted-foreground">
@@ -219,7 +219,7 @@ export default function DashboardPage() {
         </CardSection>
 
         {/* (2) Priority bars + counts */}
-        <CardSection className="p-5">
+        <CardSection className="p-5 shadow-sm transition-shadow hover:shadow-md">
           <div className="mb-3">
             <h2 className="text-sm font-medium">Priority breakdown</h2>
             <p className="text-xs text-muted-foreground">Low / Medium / High</p>
@@ -267,7 +267,7 @@ export default function DashboardPage() {
         </CardSection>
 
         {/* (3) Daily trend */}
-        <CardSection className="p-5">
+        <CardSection className="p-5 shadow-sm transition-shadow hover:shadow-md">
           <div className="mb-3">
             <h2 className="text-sm font-medium">New tickets trend</h2>
             <p className="text-xs text-muted-foreground">Last 7 days</p>
@@ -294,7 +294,7 @@ export default function DashboardPage() {
         </CardSection>
 
         {/* (4) Recent tickets preview */}
-        <CardSection className="p-5">
+        <CardSection className="p-5 shadow-sm transition-shadow hover:shadow-md">
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
               <h2 className="text-sm font-medium">Recent tickets</h2>
