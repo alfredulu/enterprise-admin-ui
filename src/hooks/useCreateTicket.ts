@@ -13,7 +13,6 @@ export function useCreateTicket() {
   return useMutation({
     mutationFn: (input: CreateTicketInput) => createTicket(input),
     onSuccess: () => {
-      // refresh tickets list (all pages)
       qc.invalidateQueries({ queryKey: ["tickets"] });
       qc.invalidateQueries({ queryKey: ["ticket_stats"] });
     },

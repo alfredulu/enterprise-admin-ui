@@ -3,7 +3,6 @@ import type { Ticket } from "@/types/ticket";
 
 export const PAGE_SIZE = 10;
 
-/** ---------- Tickets list (paged) ---------- */
 export type TicketsResponse = {
   tickets: Ticket[];
   total: number;
@@ -27,7 +26,6 @@ export async function getTickets(page: number): Promise<TicketsResponse> {
   };
 }
 
-/** ---------- Create / Update / Delete ---------- */
 export type CreateTicketInput = {
   title: string;
   status: string;
@@ -65,7 +63,6 @@ export async function deleteTicket(id: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
-/** ---------- Dashboard stats (RPC) ---------- */
 export type TicketStats = {
   total: number;
   open: number;
@@ -81,7 +78,6 @@ export async function getTicketStats(): Promise<TicketStats> {
 
   if (error) throw new Error(error.message);
 
-  // PostgREST returns an array for RETURNS TABLE
   const row = Array.isArray(data) ? data[0] : data;
 
   return {
@@ -96,7 +92,7 @@ export async function getTicketStats(): Promise<TicketStats> {
 }
 
 export type DailyCount = {
-  day: string; // ISO date string
+  day: string;
   count: number;
 };
 

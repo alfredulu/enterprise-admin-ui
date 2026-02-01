@@ -260,7 +260,6 @@ export default function TicketsPage() {
 
       {/* Table */}
       <CardSection className="p-0 overflow-hidden">
-        {/* Horizontal scroll only for the table area */}
         <div className="overflow-x-auto">
           <table className="w-full min-w-225 text-sm tickets-table">
             <thead className="bg-muted/70 text-muted-foreground">

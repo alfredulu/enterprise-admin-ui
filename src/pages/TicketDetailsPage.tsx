@@ -121,7 +121,6 @@ export default function TicketDetailsPage() {
         </button>
       </div>
 
-      {/* Main form card */}
       <CardSection className="p-6">
         <div className="grid gap-5">
           <div className="space-y-2">
@@ -185,7 +184,6 @@ export default function TicketDetailsPage() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center justify-end gap-3 border-t border-border pt-4">
             <div className="mr-auto text-sm text-muted-foreground">
               {saved ? "Saved ✓" : " "}

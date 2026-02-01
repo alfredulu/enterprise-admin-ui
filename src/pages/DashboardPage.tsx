@@ -66,7 +66,6 @@ function ChartLegend({ payload }: any) {
 }
 
 function formatDayLabel(iso: string) {
-  // iso: "2026-01-31"
   const d = new Date(iso);
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }

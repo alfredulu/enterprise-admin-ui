@@ -50,7 +50,6 @@ function SidebarContent({
         </nav>
       </div>
 
-      {/* footer pinned to bottom */}
       <div className="mt-4 border-t border-[hsl(var(--sidebar-hover))] pt-4">
         <div className="text-xs text-[hsl(var(--sidebar-muted))]">
           Signed in as
@@ -99,7 +98,9 @@ export default function AppLayout() {
     setConfirmLogout(false);
   }
 
-  // controls the mobile Sheet open/close
+  {
+    /* Mobile sheet close */
+  }
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
@@ -178,7 +179,6 @@ export default function AppLayout() {
                 </div>
               </header>
 
-              {/* Main scroll is independent */}
               <main className="min-w-0 flex-1 overflow-y-auto p-4 md:p-6">
                 <div className="mb-6">
                   <h1 className="text-xl font-semibold">Enterprise Admin UI</h1>

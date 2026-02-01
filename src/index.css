@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Define theme variables globally (NOT inside @layer) */
 :root {
   --background: 0, 0%, 100%;
   --foreground: 240, 10%, 3.9%;
