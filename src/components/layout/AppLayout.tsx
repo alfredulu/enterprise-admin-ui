@@ -25,7 +25,7 @@ function SidebarContent({
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col p-4">
-      <div className="text-lg font-semibold">SaaS Admin</div>
+      <div className="text-lg font-semibold">Enterprise Admin UI</div>
 
       {/* nav scrolls if needed */}
       <div className="mt-4 flex-1 min-h-0 overflow-y-auto">
