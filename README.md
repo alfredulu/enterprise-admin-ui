@@ -79,7 +79,7 @@ src/
 
 supabase/
 └─ functions/     # edge functions (Deno runtime)
-
+```
 
 ---
 
