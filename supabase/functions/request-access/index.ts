@@ -1,6 +1,4 @@
 // @ts-nocheck
-// This file runs on Supabase Edge Functions (Deno). VS Code TS server can't resolve remote Deno imports without Deno tooling.
-
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -27,18 +25,17 @@ serve(async (req) => {
 
   const SB_PROJECT_URL = Deno.env.get("SB_PROJECT_URL")!;
   const SB_SERVICE_ROLE_KEY = Deno.env.get("SB_SERVICE_ROLE_KEY")!;
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
+
+  const supabase = createClient(SB_PROJECT_URL, SB_SERVICE_ROLE_KEY);
 
   const { data: adminRow } = await supabase
-    .from("app_settings")
+    .from("public_settings")
     .select("value")
     .eq("key", "admin_contact_email")
     .maybeSingle();
 
   const ADMIN_CONTACT_EMAIL = String(adminRow?.value ?? "").trim();
-
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
-
-  const supabase = createClient(SB_PROJECT_URL, SB_SERVICE_ROLE_KEY);
 
   const { error: insertErr } = await supabase
     .from("access_requests")
@@ -54,22 +51,22 @@ serve(async (req) => {
     });
   }
 
-  const subject = `Access request — ${clean}`;
-  const html = `
-    <div style="font-family:ui-sans-serif,system-ui">
-      <h2>Access request</h2>
-      <p>A user requested access:</p>
-      <p><b>${clean}</b></p>
-      <p>Open Supabase Auth/Users to create this user (or create staff via your app flow).</p>
-    </div>
-  `;
-
   if (!ADMIN_CONTACT_EMAIL) {
     return new Response(JSON.stringify({ ok: true, emailed: false }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   }
+
+  const subject = `Access request — ${clean}`;
+  const html = `
+    <div style="font-family:ui-sans-serif,system-ui">
+      <h2>Access request</h2>
+      <p>A user requested access:</p>
+      <p><b>${clean}</b></p>
+      <p>Open Supabase Auth/Users to create this user.</p>
+    </div>
+  `;
 
   const resendResp = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -78,21 +75,14 @@ serve(async (req) => {
       Authorization: `Bearer ${RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: "Enterprise Admin UI <onboarding@resend.dev>", // change once you verify a domain
+      from: "Enterprise Admin UI <onboarding@resend.dev>",
       to: [ADMIN_CONTACT_EMAIL],
       subject,
       html,
     }),
   });
 
-  if (!resendResp.ok) {
-    return new Response(JSON.stringify({ ok: true, emailed: false }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  return new Response(JSON.stringify({ ok: true, emailed: true }), {
+  return new Response(JSON.stringify({ ok: true, emailed: resendResp.ok }), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });

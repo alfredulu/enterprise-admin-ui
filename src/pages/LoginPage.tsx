@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { getAdminContactEmail } from "@/services/appSettings";
 
 type LocationState = { from?: string } | null;
 
@@ -24,31 +26,15 @@ export default function LoginPage() {
   const [info, setInfo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const { data: adminEmail } = useQuery({
+    queryKey: ["admin_contact_email"],
+    queryFn: getAdminContactEmail,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const adminEmailText = adminEmail ?? "";
+
   const demoEnabled = useMemo(() => Boolean(DEMO_EMAIL && DEMO_PASSWORD), []);
-
-  const [adminEmail, setAdminEmail] = useState<string>("admin@company.com");
-
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      const { data, error } = await supabase
-        .from("app_settings")
-        .select("value")
-        .eq("key", "admin_contact_email")
-        .maybeSingle();
-
-      if (!alive) return;
-
-      if (!error && data?.value) {
-        setAdminEmail(String(data.value));
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
 
   async function onSignIn(e: React.FormEvent) {
     e.preventDefault();
@@ -108,7 +94,7 @@ export default function LoginPage() {
       if (error) throw error;
 
       setInfo(
-        `Request submitted.\nAn admin will review it.\nContact: ${adminEmail}`
+        `Request submitted.\nAn admin will review it.\nContact: ${adminEmailText}`
       );
       setRequestEmail("");
     } catch (e: any) {
@@ -206,7 +192,7 @@ export default function LoginPage() {
             <div className="text-sm font-medium">Not registered?</div>
             <p className="text-sm text-muted-foreground">
               Submit your email to request access from the admin{" "}
-              <span className="font-medium">{adminEmail}</span>.
+              <span className="font-medium">{adminEmailText || " "}</span>.
             </p>
 
             <Input
