@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { createAccessRequest } from "@/services/accessRequests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -73,12 +72,23 @@ export default function LoginPage() {
   async function onRequestAccess() {
     setError(null);
     setInfo(null);
-    setLoading(true);
 
+    const clean = requestEmail.trim().toLowerCase();
+    if (!clean) {
+      setError("Please enter your email to request access.");
+      return;
+    }
+
+    setLoading(true);
     try {
-      await createAccessRequest(requestEmail);
+      const { error } = await supabase.functions.invoke("request-access", {
+        body: { email: clean },
+      });
+
+      if (error) throw error;
+
       setInfo(
-        `Request sent.\nAn admin will review it.\nContact: ${ADMIN_CONTACT_EMAIL}`
+        `Request submitted.\nAn admin will review it.\nContact: ${ADMIN_CONTACT_EMAIL}`
       );
       setRequestEmail("");
     } catch (e: any) {

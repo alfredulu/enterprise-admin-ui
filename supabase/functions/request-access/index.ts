@@ -22,12 +22,12 @@ serve(async (req) => {
     });
   }
 
-  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-  const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const SB_PROJECT_URL = Deno.env.get("SB_PROJECT_URL")!;
+  const SB_SERVICE_ROLE_KEY = Deno.env.get("SB_SERVICE_ROLE_KEY")!;
   const ADMIN_CONTACT_EMAIL = Deno.env.get("ADMIN_CONTACT_EMAIL")!;
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!; // or SendGrid/etc.
 
-  const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+  const supabase = createClient(SB_PROJECT_URL, SB_SERVICE_ROLE_KEY);
 
   // 1) Store request
   const { error: insertErr } = await supabase
