@@ -9,7 +9,6 @@ export async function createAccessRequest(email: string) {
     .insert({ email: cleaned });
 
   if (error) {
-    // Friendly duplicate message
     if (error.code === "23505") {
       throw new Error("Request already submitted. Please wait for approval.");
     }

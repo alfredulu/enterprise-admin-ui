@@ -1,3 +1,6 @@
+// @ts-nocheck
+// This file runs on Supabase Edge Functions (Deno). VS Code TS server can't resolve remote Deno imports without Deno tooling.
+
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -25,16 +28,14 @@ serve(async (req) => {
   const SB_PROJECT_URL = Deno.env.get("SB_PROJECT_URL")!;
   const SB_SERVICE_ROLE_KEY = Deno.env.get("SB_SERVICE_ROLE_KEY")!;
   const ADMIN_CONTACT_EMAIL = Deno.env.get("ADMIN_CONTACT_EMAIL")!;
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!; // or SendGrid/etc.
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 
   const supabase = createClient(SB_PROJECT_URL, SB_SERVICE_ROLE_KEY);
 
-  // 1) Store request
   const { error: insertErr } = await supabase
     .from("access_requests")
     .insert({ email: clean });
 
-  // If duplicate pending request, return OK (don’t leak info / don’t fail UX)
   if (
     insertErr &&
     !String(insertErr.message).toLowerCase().includes("duplicate")
@@ -45,7 +46,6 @@ serve(async (req) => {
     });
   }
 
-  // 2) Email admin (Resend)
   const subject = `Access request — ${clean}`;
   const html = `
     <div style="font-family:ui-sans-serif,system-ui">
@@ -71,8 +71,6 @@ serve(async (req) => {
   });
 
   if (!resendResp.ok) {
-    // Don’t fail the whole request if email provider hiccups
-    // DB insert already succeeded (or duplicate)
     return new Response(JSON.stringify({ ok: true, emailed: false }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
