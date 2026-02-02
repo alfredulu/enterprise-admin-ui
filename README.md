@@ -31,7 +31,7 @@ This project is built on the philosophy that the UI should be a "dumb" consumer 
 
 ## ⚡ Key API & Engineering Features
 
-###🛠️ The "API-First" Service Layer
+### 🛠️ The "API-First" Service Layer
 
 Instead of scattered database calls, this project uses a centralized Service Boundary.
 - **Encapsulation:** All data fetching logic is isolated in src/services/.
@@ -121,3 +121,5 @@ This project implements Zero Trust at the API level. Even if the frontend code i
 ## ⚖️ License
 
 ### MIT License.
+
+---
