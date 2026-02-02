@@ -151,35 +151,4 @@ VITE_DEMO_PASSWORD=(demo user password)
 ## ⚖️ License
 
 ### MIT
-
----
-
-## 🔒 Security Notes
-
-- 🔒 All data access is protected with Supabase RLS
-
-- ✅ Sensitive operations are server-validated
-
-- 🚫 Client never trusts itself for authorization
-
----
-
-## 📈 Future Improvements
-
-- 👥 Role-based UI permissions (Admin / Member)
-
-- 🏢 Team & organization support
-
-- 📜 Activity audit logs
-
-- 📑 Advanced reporting & exports
-
-- 📱 Mobile-first navigation refinement
-
----
-
-## ⚖️ License
-
-### 📜 MIT
-
 ````
