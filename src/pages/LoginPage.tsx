@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +25,30 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const demoEnabled = useMemo(() => Boolean(DEMO_EMAIL && DEMO_PASSWORD), []);
+
+  const [adminEmail, setAdminEmail] = useState<string>("admin@company.com");
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "admin_contact_email")
+        .maybeSingle();
+
+      if (!alive) return;
+
+      if (!error && data?.value) {
+        setAdminEmail(String(data.value));
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   async function onSignIn(e: React.FormEvent) {
     e.preventDefault();
@@ -84,7 +108,7 @@ export default function LoginPage() {
       if (error) throw error;
 
       setInfo(
-        `Request submitted.\nAn admin will review it.\nContact: ${ADMIN_CONTACT_EMAIL}`
+        `Request submitted.\nAn admin will review it.\nContact: ${adminEmail}`
       );
       setRequestEmail("");
     } catch (e: any) {
@@ -182,7 +206,7 @@ export default function LoginPage() {
             <div className="text-sm font-medium">Not registered?</div>
             <p className="text-sm text-muted-foreground">
               Submit your email to request access from the admin{" "}
-              <span className="font-medium">{ADMIN_CONTACT_EMAIL}</span>.
+              <span className="font-medium">{adminEmail}</span>.
             </p>
 
             <Input
@@ -227,14 +251,6 @@ export default function LoginPage() {
             >
               Use demo account
             </Button>
-
-            {!demoEnabled ? (
-              <p className="text-xs text-muted-foreground">
-                Demo not configured. Set{" "}
-                <span className="font-mono">VITE_DEMO_EMAIL</span> and{" "}
-                <span className="font-mono">VITE_DEMO_PASSWORD</span>.
-              </p>
-            ) : null}
           </div>
         </CardContent>
       </Card>
