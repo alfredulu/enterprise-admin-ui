@@ -10,6 +10,7 @@ import ProtectedRoute from "@/app/ProtectedRoute";
 import { useSession } from "@/features/auth/useSession";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import AuthCallbackPage from "@/pages/AuthCallbackPage";
 
 export default function App() {
   const { isAuthed, loading } = useSession();
@@ -24,7 +25,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route element={<ProtectedRoute isAuthed={isAuthed} loading={loading} />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

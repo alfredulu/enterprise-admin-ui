@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { createAccessRequest } from "@/services/accessRequests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,9 @@ const ADMIN_CONTACT_EMAIL =
   (import.meta.env.VITE_ADMIN_CONTACT_EMAIL as string | undefined) ??
   "admin@company.com";
 
+const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL as string | undefined;
+const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined;
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,16 +23,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [requestEmail, setRequestEmail] = useState("");
+
   const [loading, setLoading] = useState(false);
+  const [info, setInfo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const demoEnabled = useMemo(() => Boolean(DEMO_EMAIL && DEMO_PASSWORD), []);
 
   async function onSignIn(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setInfo(null);
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     });
 
@@ -42,10 +52,66 @@ export default function LoginPage() {
     navigate(state?.from ?? "/dashboard", { replace: true });
   }
 
-  function onRequestAccess() {
-    setError(
-      `Request access: This is an internal admin dashboard. Ask an administrator to create your account. Contact: ${ADMIN_CONTACT_EMAIL}`
-    );
+  async function onGoogleSignIn() {
+    setError(null);
+    setInfo(null);
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  }
+
+  async function onRequestAccess() {
+    setError(null);
+    setInfo(null);
+    setLoading(true);
+
+    try {
+      await createAccessRequest(requestEmail);
+      setInfo(
+        `Request sent.\nAn admin will review it.\nContact: ${ADMIN_CONTACT_EMAIL}`
+      );
+      setRequestEmail("");
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to submit request.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onDemoLogin() {
+    setError(null);
+    setInfo(null);
+
+    if (!DEMO_EMAIL || !DEMO_PASSWORD) {
+      setError("Demo is not configured.");
+      return;
+    }
+
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    navigate("/dashboard", { replace: true });
   }
 
   return (
@@ -54,11 +120,11 @@ export default function LoginPage() {
         <CardHeader className="space-y-1">
           <CardTitle>Sign in</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Internal. Accounts are created by an administrator.
+            Internal dashboard for managing tickets, users, and settings.
           </p>
         </CardHeader>
 
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           <form className="space-y-3" onSubmit={onSignIn}>
             <Input
               placeholder="Email"
@@ -83,6 +149,12 @@ export default function LoginPage() {
               </div>
             ) : null}
 
+            {info ? (
+              <div className="text-sm text-muted-foreground whitespace-pre-line">
+                {info}
+              </div>
+            ) : null}
+
             <Button className="w-full" disabled={loading} type="submit">
               {loading ? "Signing in…" : "Sign in"}
             </Button>
@@ -92,11 +164,72 @@ export default function LoginPage() {
             className="w-full"
             variant="secondary"
             disabled={loading}
-            onClick={onRequestAccess}
+            onClick={onGoogleSignIn}
             type="button"
           >
-            Request access
+            Continue with Google
           </Button>
+
+          <div className="pt-5 border-t border-border" />
+
+          <div className="space-y-2">
+            <div className="text-sm font-medium">Not registered?</div>
+            <p className="text-sm text-muted-foreground">
+              Submit your email to request access from the admin{" "}
+              <span className="font-medium">{ADMIN_CONTACT_EMAIL}</span>.
+            </p>
+
+            <Input
+              placeholder="Your email for access request"
+              type="email"
+              value={requestEmail}
+              onChange={(e) => setRequestEmail(e.target.value)}
+              autoComplete="email"
+            />
+
+            <Button
+              className="w-full"
+              variant="outline"
+              disabled={loading || !requestEmail.trim()}
+              onClick={onRequestAccess}
+              type="button"
+            >
+              Request access
+            </Button>
+          </div>
+
+          <div className="pt-8 border-t border-border" />
+
+          <div className="space-y-2">
+            <div className="text-sm font-medium">Demo access (temporary)</div>
+            <p className="text-sm text-muted-foreground">
+              For review purposes, you can explore the app using a demo account.
+              This will be removed in production.
+            </p>
+
+            <Button
+              className="w-full"
+              variant="secondary"
+              disabled={loading || !demoEnabled}
+              onClick={onDemoLogin}
+              type="button"
+              title={
+                demoEnabled
+                  ? "Sign in with demo user"
+                  : "Set VITE_DEMO_EMAIL and VITE_DEMO_PASSWORD"
+              }
+            >
+              Use demo account
+            </Button>
+
+            {!demoEnabled ? (
+              <p className="text-xs text-muted-foreground">
+                Demo not configured. Set{" "}
+                <span className="font-mono">VITE_DEMO_EMAIL</span> and{" "}
+                <span className="font-mono">VITE_DEMO_PASSWORD</span>.
+              </p>
+            ) : null}
+          </div>
         </CardContent>
       </Card>
     </div>
