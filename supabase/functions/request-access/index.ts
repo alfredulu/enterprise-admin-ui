@@ -27,7 +27,15 @@ serve(async (req) => {
 
   const SB_PROJECT_URL = Deno.env.get("SB_PROJECT_URL")!;
   const SB_SERVICE_ROLE_KEY = Deno.env.get("SB_SERVICE_ROLE_KEY")!;
-  const ADMIN_CONTACT_EMAIL = Deno.env.get("ADMIN_CONTACT_EMAIL")!;
+
+  const { data: adminRow } = await supabase
+    .from("app_settings")
+    .select("value")
+    .eq("key", "admin_contact_email")
+    .maybeSingle();
+
+  const ADMIN_CONTACT_EMAIL = String(adminRow?.value ?? "").trim();
+
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 
   const supabase = createClient(SB_PROJECT_URL, SB_SERVICE_ROLE_KEY);
@@ -55,6 +63,13 @@ serve(async (req) => {
       <p>Open Supabase Auth/Users to create this user (or create staff via your app flow).</p>
     </div>
   `;
+
+  if (!ADMIN_CONTACT_EMAIL) {
+    return new Response(JSON.stringify({ ok: true, emailed: false }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   const resendResp = await fetch("https://api.resend.com/emails", {
     method: "POST",
