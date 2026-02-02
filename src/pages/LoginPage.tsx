@@ -7,10 +7,6 @@ import { Button } from "@/components/ui/button";
 
 type LocationState = { from?: string } | null;
 
-const ADMIN_CONTACT_EMAIL =
-  (import.meta.env.VITE_ADMIN_CONTACT_EMAIL as string | undefined) ??
-  "admin@company.com";
-
 const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL as string | undefined;
 const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined;
 
