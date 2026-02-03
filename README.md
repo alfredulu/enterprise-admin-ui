@@ -34,13 +34,14 @@ This project is built on the philosophy that the UI should be a "dumb" consumer 
 ### 🛠️ The "API-First" Service Layer
 
 Instead of scattered database calls, this project uses a centralized Service Boundary.
+
 - **Encapsulation:** All data fetching logic is isolated in src/services/.
 - **Type Safety:** End-to-end TypeScript ensures that a change in the database schema breaks the build at the service layer, preventing runtime UI crashes.
 - **Abstraction:** Switching from Supabase to a custom REST or GraphQL API would only require modifying the Service Layer, leaving the UI components untouched.
 
 ### 📊 Server-Side Intelligence (SQL/RPC)
 
-#### Rather than fetching thousands of rows and calculating totals in the browser (which kills performance), this app offloads heavy lifting to the database:
+Rather than fetching thousands of rows and calculating totals in the browser (which kills performance), this app offloads heavy lifting to the database:
 
 - **Direct RPC Calls:** Dashboard analytics (Ticket trends, Priority distribution) are calculated via PostgreSQL Functions.
 - **Performance:** Reduces payload size by ~90% for analytical views.
@@ -48,6 +49,7 @@ Instead of scattered database calls, this project uses a centralized Service Bou
 ### 🤖 Serverless Edge Orchestration
 
 The "Request Access" flow isn't just a database insert. It triggers a Deno-based Edge Function that:
+
 1. Validates the request via the Service Role (Bypassing RLS securely).
 2. Communicates with external Third-Party APIs (Resend for Email).
 3. Returns a unified response to the frontend.
@@ -56,19 +58,20 @@ The "Request Access" flow isn't just a database insert. It triggers a Deno-based
 
 ## 🧩 Tech Stack
 
-| Layer | Technology | Purpose |
-| :--- | :--- | :--- |
-| **Frontend** | React + Vite | Fast, modern UI library & build tool. |
-| **State / API** | TanStack Query | The "brain" that manages server-state, caching, and synchronization. |
-| **Logic** | TypeScript | Ensures the "API Contract" is never broken with end-to-end type safety. |
-| **Backend** | Supabase (Postgres) | Real-time database with built-in Authentication. |
-| **Security** | RLS (Row Level Security) | Enterprise-grade, database-level API security. |
-| **UI** | shadcn/ui + Tailwind | Consistent, accessible design tokens and headless components. |
+| Layer           | Technology               | Purpose                                                                 |
+| :-------------- | :----------------------- | :---------------------------------------------------------------------- |
+| **Frontend**    | React + Vite             | Fast, modern UI library & build tool.                                   |
+| **State / API** | TanStack Query           | The "brain" that manages server-state, caching, and synchronization.    |
+| **Logic**       | TypeScript               | Ensures the "API Contract" is never broken with end-to-end type safety. |
+| **Backend**     | Supabase (Postgres)      | Real-time database with built-in Authentication.                        |
+| **Security**    | RLS (Row Level Security) | Enterprise-grade, database-level API security.                          |
+| **UI**          | shadcn/ui + Tailwind     | Consistent, accessible design tokens and headless components.           |
 
----    
+---
 
 ### 🗂️ Project Structure
-``` Text
+
+```Text
 src/
 ├─ services/      # The "API Client" - Typed data access layer
 ├─ hooks/         # The "Data Connectors" - React Query wrappers
@@ -78,20 +81,50 @@ src/
 └─ supabase/      # Backend-as-Code (Edge functions & SQL)
 ```
 
+---
+
+## ✅ Prerequisites (important)
+
+This project assumes you have a Supabase project with:
+
+- Tables used by the app (tickets, profiles, etc.)
+- SQL/RPC functions for analytics
+- RLS policies applied
+
+Optional:
+
+- An email provider (e.g. Resend) if you want admin email notifications when someone requests access
+  -- If not configured, the request can still be stored in access_requests.
+
+---
+
 ## 🚀 Getting Started
 
 ### 1. Clone & Install
+
 `npm install`
 
 ### 2. Environment Configuration
-#### Create a .env file with your Supabase API Gateway credentials:
+
+Create a .env file with your Supabase API Gateway credentials:
+
 ```
 VITE_SUPABASE_URL=your_project_url
 VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-### 3. Initialize the "API" (Database)
-#### To enable the Admin Contact API, run this in your Supabase SQL Editor:
+### 3. Start dev server
+
+`npm run dev`
+
+---
+
+## ⚙️ Admin contact email (DB-driven)
+
+**Table:** `public.app_settings`
+
+To enable the Admin Contact API, run this in your Supabase SQL Editor:
+
 ```
 -- Creates the settings 'API endpoint' inside your DB
 create table if not exists public.app_settings (
@@ -101,17 +134,40 @@ create table if not exists public.app_settings (
 
 insert into public.app_settings(key, value)
 values ('admin_contact_email', 'admin@company.com');
+on conflict (key) do update set value = excluded.value;
+```
 
+### RLS (read-only for just that row)
+
+The login page loads before authentication, so it needs public read access to only that one row:
+
+**Row:** `key = 'admin_contact_email'`
+
+```
 -- Secure the endpoint
 alter table public.app_settings enable row level security;
-create policy "Public Read Access" on public.app_settings for select using (key = 'admin_contact_email');
+
+drop policy if exists "read admin_contact_email" on public.app_settings;
+
+create policy "read admin_contact_email"
+on public.app_settings
+for select
+to anon, authenticated
+using (key = 'admin_contact_email');
 ```
+
+- ✅ Anyone can read only admin_contact_email
+
+- 🚫 No client inserts/updates/deletes are allowed (no policies added for those)
+
+-- Owner role assignment is an admin action.
 
 ---
 
 ## 🔒 Security Policy
 
 This project implements Zero Trust at the API level. Even if the frontend code is compromised, the data is protected by:
+
 - JWT Verification: Every request is signed and verified.
 - RLS Policies: Users can only "See" what the database API allows them to see.
 - Server-Side Secrets: Sensitive keys (Like Resend API) never reach the browser; they live exclusively in Supabase Vault.
