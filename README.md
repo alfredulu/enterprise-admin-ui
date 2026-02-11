@@ -2,7 +2,7 @@
 
 ### A Production-Ready Full-Stack Dashboard
 
-**Live demo:** https://enterprise-admin-ui.vercel.app/
+**Live @:** https://enterprise-admin-ui.vercel.app/
 
 This project focuses on Data Integrity and Scalability. It is a production-ready internal admin system built with a strict separation of concerns, mimicking the architecture of high-scale SaaS platforms. It bridges the gap between a polished React UI and a complex, secured Supabase backend.
 
