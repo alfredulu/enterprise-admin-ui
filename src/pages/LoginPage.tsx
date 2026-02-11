@@ -57,24 +57,6 @@ export default function LoginPage() {
     navigate(state?.from ?? "/dashboard", { replace: true });
   }
 
-  async function onGoogleSignIn() {
-    setError(null);
-    setInfo(null);
-    setLoading(true);
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-
-    if (error) {
-      setLoading(false);
-      setError(error.message);
-    }
-  }
-
   async function onRequestAccess() {
     setError(null);
     setInfo(null);
@@ -175,16 +157,6 @@ export default function LoginPage() {
               {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
-
-          <Button
-            className="w-full"
-            variant="secondary"
-            disabled={loading}
-            onClick={onGoogleSignIn}
-            type="button"
-          >
-            Continue with Google
-          </Button>
 
           <div className="pt-5 border-t border-border" />
 
