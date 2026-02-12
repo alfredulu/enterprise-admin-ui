@@ -28,3 +28,9 @@ supabase/.env
 *.njsproj
 *.sln
 *.sw?
+
+
+# Supabase / Edge Functions build temp
+supabase/.temp/
+supabase/.cache/
+.supabase
