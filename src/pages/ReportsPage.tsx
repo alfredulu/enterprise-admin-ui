@@ -1,10 +1,22 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Page, PageHeader, CardSection } from "@/components/ui/page";
-import { getTicketDailyCounts, getTicketStats, getTickets } from "@/services/tickets";
-import type { DailyCount, TicketStats, TicketsResponse } from "@/services/tickets";
+import {
+  getTicketDailyCounts,
+  getTicketStats,
+  getTickets,
+} from "@/services/tickets";
+import type {
+  DailyCount,
+  TicketStats,
+  TicketsResponse,
+} from "@/services/tickets";
 
-function download(content: string, fileName: string, type = "text/plain;charset=utf-8;") {
+function download(
+  content: string,
+  fileName: string,
+  type = "text/plain;charset=utf-8;"
+) {
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -38,7 +50,9 @@ export default function ReportsPage() {
   const avgDaily = useMemo(() => {
     const rows = dailyQuery.data ?? [];
     if (rows.length === 0) return 0;
-    return (rows.reduce((acc, item) => acc + item.count, 0) / rows.length).toFixed(1);
+    return (
+      rows.reduce((acc, item) => acc + item.count, 0) / rows.length
+    ).toFixed(1);
   }, [dailyQuery.data]);
 
   function exportSummary() {
@@ -52,17 +66,26 @@ export default function ReportsPage() {
       sample_recent_tickets: recentQuery.data?.tickets ?? [],
     };
 
-    download(JSON.stringify(summary, null, 2), "admin-report-summary.json", "application/json;charset=utf-8;");
+    download(
+      JSON.stringify(summary, null, 2),
+      "admin-report-summary.json",
+      "application/json;charset=utf-8;"
+    );
   }
 
   function exportDailyCsv() {
     const rows = dailyQuery.data ?? [];
-    const csv = ["day,count", ...rows.map((row) => `${row.day},${row.count}`)].join("\n");
+    const csv = [
+      "day,count",
+      ...rows.map((row) => `${row.day},${row.count}`),
+    ].join("\n");
     download(csv, "daily-ticket-volume.csv", "text/csv;charset=utf-8;");
   }
 
   if (statsQuery.isPending || dailyQuery.isPending || recentQuery.isPending) {
-    return <div className="text-sm text-muted-foreground">Loading reports…</div>;
+    return (
+      <div className="text-sm text-muted-foreground">Loading reports…</div>
+    );
   }
 
   if (statsQuery.isError || dailyQuery.isError || recentQuery.isError) {
@@ -70,7 +93,11 @@ export default function ReportsPage() {
       (statsQuery.error as Error | null)?.message ??
       (dailyQuery.error as Error | null)?.message ??
       (recentQuery.error as Error | null)?.message;
-    return <div className="text-sm text-destructive">Error: {message ?? "Unknown error"}</div>;
+    return (
+      <div className="text-sm text-destructive">
+        Error: {message ?? "Unknown error"}
+      </div>
+    );
   }
 
   const stats = statsQuery.data;
@@ -104,7 +131,8 @@ export default function ReportsPage() {
       <CardSection className="p-4">
         <h3 className="text-base font-semibold">One-click exports</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Generate handoff artifacts for async updates, standups, and weekly operations review.
+          Generate handoff artifacts for async updates, standups, and weekly
+          operations review.
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
@@ -138,7 +166,10 @@ export default function ReportsPage() {
             </thead>
             <tbody>
               {(dailyQuery.data ?? []).map((row) => (
-                <tr key={row.day} className="border-t border-border [&>td]:px-3 [&>td]:py-2">
+                <tr
+                  key={row.day}
+                  className="border-t border-border [&>td]:px-3 [&>td]:py-2"
+                >
                   <td>{new Date(row.day).toLocaleDateString()}</td>
                   <td>{row.count}</td>
                 </tr>
