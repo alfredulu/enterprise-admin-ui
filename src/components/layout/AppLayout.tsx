@@ -5,15 +5,23 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { LogoutConfirmProvider } from "@/app/LogoutConfirmContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import {
+  Menu,
+  LayoutDashboard,
+  Command,
+  Ticket,
+  BarChart3,
+  Users,
+  Settings,
+} from "lucide-react";
 
 const navItems = [
-  { to: "/dashboard", label: "Dashboard" },
-  { to: "/command-center", label: "Command Center" },
-  { to: "/tickets", label: "Tickets" },
-  { to: "/reports", label: "Reports" },
-  { to: "/users", label: "Users" },
-  { to: "/settings", label: "Settings" },
+  { to: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
+  { to: "/command-center", label: "Command Center", Icon: Command },
+  { to: "/tickets", label: "Tickets", Icon: Ticket },
+  { to: "/reports", label: "Reports", Icon: BarChart3 },
+  { to: "/users", label: "Users", Icon: Users },
+  { to: "/settings", label: "Settings", Icon: Settings },
 ];
 
 function SidebarContent({
@@ -46,7 +54,8 @@ function SidebarContent({
                 ].join(" ")
               }
             >
-              {item.label}
+              <span>{item.label}</span>
+              <item.Icon className="ml-auto h-4 w-4 opacity-70" />
             </NavLink>
           ))}
         </nav>
