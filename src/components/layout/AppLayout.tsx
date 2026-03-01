@@ -9,7 +9,9 @@ import { Menu } from "lucide-react";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard" },
+  { to: "/command-center", label: "Command Center" },
   { to: "/tickets", label: "Tickets" },
+  { to: "/reports", label: "Reports" },
   { to: "/users", label: "Users" },
   { to: "/settings", label: "Settings" },
 ];

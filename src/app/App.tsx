@@ -6,6 +6,8 @@ import UsersPage from "@/pages/UsersPage";
 import TicketsPage from "@/pages/TicketsPage";
 import TicketDetailsPage from "@/pages/TicketDetailsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import CommandCenterPage from "@/pages/CommandCenterPage";
+import ReportsPage from "@/pages/ReportsPage";
 import ProtectedRoute from "@/app/ProtectedRoute";
 import { useSession } from "@/features/auth/useSession";
 import { useEffect } from "react";
@@ -33,6 +35,8 @@ export default function App() {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/tickets" element={<TicketsPage />} />
           <Route path="/tickets/:id" element={<TicketDetailsPage />} />
+          <Route path="/command-center" element={<CommandCenterPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
