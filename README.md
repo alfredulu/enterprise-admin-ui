@@ -16,8 +16,9 @@ This project is built on the philosophy that the UI should be a "dumb" consumer 
 
 1. **Modern Dashboard:** Clean, high-density layouts designed for data clarity.
 2. **Adaptive Theming:** System-aware Dark/Light mode with persistent state.
-3. **Data-Dense Tables:** Zebra-striped, hover-active tables featuring pagination that actually works (correct total counts, not just page-by-page).
-4. **Responsive Core:** Desktop-first precision with a mobile-safe fallback.
+3. **Operational Workspaces:** Dedicated **Command Center** for queue triage and **Reports** for export-friendly analytics.
+4. **Data-Dense Tables:** Zebra-striped, hover-active tables featuring pagination that actually works (correct total counts, not just page-by-page).
+5. **Responsive Core:** Desktop-first precision with a mobile-safe fallback.
 
 ## The Data Flow Pipeline
 
@@ -43,16 +44,7 @@ Instead of scattered database calls, this project uses a centralized Service Bou
 
 Rather than fetching thousands of rows and calculating totals in the browser (which kills performance), this app offloads heavy lifting to the database:
 
-- **Direct RPC Calls:** Dashboard analytics (Ticket trends, Priority distribution) are calculated via PostgreSQL Functions.
-- **Performance:** Reduces payload size by ~90% for analytical views.
-
-### 🤖 Serverless Edge Orchestration
-
-The "Request Access" flow isn't just a database insert. It triggers a Deno-based Edge Function that:
-
-1. Validates the request via the Service Role (Bypassing RLS securely).
-2. Communicates with external Third-Party APIs (Resend for Email).
-3. Returns a unified response to the frontend.
+@@ -55,62 +56,72 @@ The "Request Access" flow isn't just a database insert. It triggers a Deno-based 3. Returns a unified response to the frontend.
 
 ---
 
@@ -77,18 +69,27 @@ src/
 ├─ hooks/         # The "Data Connectors" - React Query wrappers
 ├─ app/           # Guarded routes & Global Providers
 ├─ features/      # Business logic (Auth, Session management)
-├─ pages/         # Pure UI Layouts
-└─ supabase/      # Backend-as-Code (Edge functions & SQL)
+└─ pages/         # Pure UI Layouts (Dashboard, Tickets, Command Center, Reports, etc.)
+
+supabase/         # Backend-as-Code at repo root (Edge functions & SQL)
 ```
 
 ---
+
+## 🧭 Core Routes
+
+- `/dashboard` — KPI and chart overview.
+- `/command-center` — triage-focused operations view (queue health + recommended actions).
+- `/tickets` — primary ticket workspace (filters, sorting, bulk actions, export).
+- `/reports` — operations reporting with JSON/CSV exports.
+- `/users` and `/settings` — staff and configuration views.
 
 ## ✅ Prerequisites (important)
 
 This project assumes you have a Supabase project with:
 
 - Tables used by the app (tickets, profiles, etc.)
-- SQL/RPC functions for analytics
+- SQL/RPC functions for analytics (`ticket_stats`, `ticket_daily_counts`)
 - RLS policies applied
 
 Optional:
