@@ -76,10 +76,14 @@ export default function TicketsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   const [lockedId, setLockedId] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<"created_desc" | "created_asc" | "priority_desc">("created_desc");
+  const [sortBy, setSortBy] = useState<
+    "created_desc" | "created_asc" | "priority_desc"
+  >("created_desc");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [bulkStatus, setBulkStatus] = useState<(typeof STATUS_OPTIONS)[number]>("open");
-  const [bulkPriority, setBulkPriority] = useState<(typeof PRIORITY_OPTIONS)[number]>("medium");
+  const [bulkStatus, setBulkStatus] =
+    useState<(typeof STATUS_OPTIONS)[number]>("open");
+  const [bulkPriority, setBulkPriority] =
+    useState<(typeof PRIORITY_OPTIONS)[number]>("medium");
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -132,17 +136,23 @@ export default function TicketsPage() {
 
   const sortedTickets = [...filteredTickets].sort((a, b) => {
     if (sortBy === "created_desc") {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
     }
 
     if (sortBy === "created_asc") {
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      return (
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
     }
 
     const score = { low: 1, medium: 2, high: 3 } as const;
-    return score[b.priority as keyof typeof score] - score[a.priority as keyof typeof score];
+    return (
+      score[b.priority as keyof typeof score] -
+      score[a.priority as keyof typeof score]
+    );
   });
-
 
   const isFiltering =
     search.trim() !== "" || filterStatus !== "all" || filterPriority !== "all";
@@ -152,16 +162,21 @@ export default function TicketsPage() {
   ).length;
 
   const staleCount = filteredTickets.filter(
-    (ticket) => ticket.status !== "closed" && ticketAgeHours(ticket.created_at) >= 48
+    (ticket) =>
+      ticket.status !== "closed" && ticketAgeHours(ticket.created_at) >= 48
   ).length;
 
-  const selectedTickets = sortedTickets.filter((ticket) => selectedIds.includes(ticket.id));
+  const selectedTickets = sortedTickets.filter((ticket) =>
+    selectedIds.includes(ticket.id)
+  );
 
   const canBulkAct = selectedTickets.length > 0;
 
   function toggleSelect(id: string) {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((selectedId) => selectedId !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((selectedId) => selectedId !== id)
+        : [...prev, id]
     );
   }
 
@@ -175,7 +190,14 @@ export default function TicketsPage() {
   }
 
   function exportFilteredTickets() {
-    const headers = ["id", "title", "status", "priority", "created_at", "age_hours"];
+    const headers = [
+      "id",
+      "title",
+      "status",
+      "priority",
+      "created_at",
+      "age_hours",
+    ];
     const rows = sortedTickets.map((ticket) => [
       ticket.id,
       `"${ticket.title.replaceAll('"', '""')}"`,
@@ -185,7 +207,9 @@ export default function TicketsPage() {
       String(ticketAgeHours(ticket.created_at)),
     ]);
 
-    const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+    const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join(
+      "\n"
+    );
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -249,11 +273,15 @@ export default function TicketsPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl border border-border bg-background p-3">
             <p className="text-xs text-muted-foreground">Visible tickets</p>
-            <p className="mt-1 text-2xl font-semibold">{filteredTickets.length}</p>
+            <p className="mt-1 text-2xl font-semibold">
+              {filteredTickets.length}
+            </p>
           </div>
           <div className="rounded-xl border border-border bg-background p-3">
             <p className="text-xs text-muted-foreground">High priority open</p>
-            <p className="mt-1 text-2xl font-semibold text-destructive">{highPriorityOpenCount}</p>
+            <p className="mt-1 text-2xl font-semibold text-destructive">
+              {highPriorityOpenCount}
+            </p>
           </div>
           <div className="rounded-xl border border-border bg-background p-3">
             <p className="text-xs text-muted-foreground">Stale (48h+)</p>
@@ -381,7 +409,9 @@ export default function TicketsPage() {
                   <SelectContent>
                     <SelectItem value="created_desc">Newest first</SelectItem>
                     <SelectItem value="created_asc">Oldest first</SelectItem>
-                    <SelectItem value="priority_desc">Highest priority</SelectItem>
+                    <SelectItem value="priority_desc">
+                      Highest priority
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -492,7 +522,10 @@ export default function TicketsPage() {
                 <th className="w-10">
                   <input
                     type="checkbox"
-                    checked={sortedTickets.length > 0 && selectedIds.length === sortedTickets.length}
+                    checked={
+                      sortedTickets.length > 0 &&
+                      selectedIds.length === sortedTickets.length
+                    }
                     onChange={toggleSelectAll}
                     title="Select all visible tickets"
                   />

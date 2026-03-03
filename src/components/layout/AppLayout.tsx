@@ -114,13 +114,32 @@ export default function AppLayout() {
   }
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  useEffect(() => {
+    const mql = window.matchMedia("(orientation: landscape)");
+    const handleChange = () => setMobileNavOpen(false);
+
+    if (mql.addEventListener) {
+      mql.addEventListener("change", handleChange);
+    } else {
+      mql.addListener(handleChange);
+    }
+
+    return () => {
+      if (mql.removeEventListener) {
+        mql.removeEventListener("change", handleChange);
+      } else {
+        mql.removeListener(handleChange);
+      }
+    };
+  }, []);
+
   return (
     <LogoutConfirmProvider value={{ requestLogout }}>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="app-layout min-h-screen bg-background text-foreground">
         <div className="h-screen w-screen overflow-hidden">
-          <div className="grid h-full grid-cols-1 md:grid-cols-[260px_1fr] overflow-hidden">
+          <div className="app-grid grid h-full grid-cols-1 md:grid-cols-[260px_1fr] overflow-hidden">
             {/* Desktop Sidebar */}
-            <aside className="hidden md:block h-full border-r border-border bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))]">
+            <aside className="app-sidebar hidden md:block h-full border-r border-border bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))]">
               <SidebarContent email={email} requestLogout={requestLogout} />
             </aside>
 
@@ -134,7 +153,7 @@ export default function AppLayout() {
                       <SheetTrigger asChild>
                         <button
                           type="button"
-                          className="md:hidden inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
+                          className="app-mobile-trigger md:hidden inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
                           title="Open menu"
                         >
                           <Menu className="h-4 w-4" />
@@ -144,7 +163,7 @@ export default function AppLayout() {
 
                       <SheetContent
                         side="left"
-                        className="w-80 p-0 bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] border-r border-border"
+                        className="app-mobile-sheet w-80 p-0 bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] border-r border-border"
                       >
                         <SidebarContent
                           email={email}
