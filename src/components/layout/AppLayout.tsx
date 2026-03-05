@@ -47,7 +47,7 @@ function SidebarContent({
               onClick={onNavigate}
               className={({ isActive }) =>
                 [
-                  "block rounded-md px-3 py-2 text-sm transition",
+                  "flex items-center justify-between rounded-md px-3 py-2 text-sm transition",
                   isActive
                     ? "bg-[hsl(var(--sidebar-hover))] font-medium"
                     : "text-[hsl(var(--sidebar-muted))] hover:bg-[hsl(var(--sidebar-hover))] hover:text-[hsl(var(--sidebar-foreground))]",
@@ -55,7 +55,7 @@ function SidebarContent({
               }
             >
               <span>{item.label}</span>
-              <item.Icon className="ml-auto h-4 w-4 opacity-70" />
+              <item.Icon className="h-4 w-4 opacity-70" />
             </NavLink>
           ))}
         </nav>
